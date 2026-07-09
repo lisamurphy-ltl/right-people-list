@@ -1,4 +1,7 @@
 import { useState, useCallback } from "react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import ICPClarityGuide from "@/components/ICPClarityGuide";
+import { getLoginUrl } from "@/const";
 import { Copy, Check, ChevronRight, Search, Zap, Shield, Download, ExternalLink } from "lucide-react";
 
 // =============================================
@@ -85,6 +88,8 @@ function TagSelector({
 }
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+  const [showClarityGuide, setShowClarityGuide] = useState(false);
   const [roles, setRoles] = useState<string[]>(["Founder", "Owner", "CEO"]);
   const [industries, setIndustries] = useState<string[]>(["Coaching", "Consulting"]);
   const [pains, setPains] = useState<string[]>(["scale", "burnout", "growth"]);
@@ -109,13 +114,17 @@ export default function Home() {
             ICP<span style={{ color: "oklch(0.78 0.18 85)" }}>Scout</span>
           </span>
         </div>
-        <a
-          href="#tool"
-          className="btn-gold text-sm px-5 py-2"
-          style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", borderRadius: "0.375rem", padding: "0.5rem 1.25rem", textDecoration: "none", transition: "all 160ms" }}
-        >
-          Build My Query
-        </a>
+        <div className="flex items-center gap-3">
+          <a href="/pricing" style={{ color: "oklch(0.65 0.008 260)", fontFamily: "Syne, sans-serif", fontWeight: 600, fontSize: "0.875rem", textDecoration: "none" }}>Pricing</a>
+          <a href={isAuthenticated ? "/dashboard" : getLoginUrl()}
+            style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, background: "oklch(0.22 0.012 260)", color: "oklch(0.80 0.008 260)", borderRadius: "0.375rem", padding: "0.5rem 1rem", textDecoration: "none", border: "1px solid oklch(0.32 0.012 260)", fontSize: "0.875rem" }}>
+            {isAuthenticated ? "Dashboard" : "Sign In"}
+          </a>
+          <a href="#tool"
+            style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", borderRadius: "0.375rem", padding: "0.5rem 1.25rem", textDecoration: "none", fontSize: "0.875rem" }}>
+            Build My Query
+          </a>
+        </div>
       </nav>
 
       {/* ── HERO ── */}
@@ -235,6 +244,12 @@ export default function Home() {
             <p className="mt-3 text-base" style={{ color: "oklch(0.60 0.008 260)", maxWidth: "520px" }}>
               Select the tags that match your ideal client. Your Google search query updates in real time below.
             </p>
+            <button
+              onClick={() => setShowClarityGuide(true)}
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all"
+              style={{ background: "oklch(0.60 0.20 255 / 0.10)", border: "1px solid oklch(0.60 0.20 255 / 0.35)", color: "oklch(0.60 0.20 255)" }}>
+              🧭 Not sure who your ICP is? Start here — it's free
+            </button>
           </div>
 
           <div className="grid lg:grid-cols-5 gap-8 items-start">
@@ -399,6 +414,98 @@ export default function Home() {
         </div>
       </section>
 
+
+      {/* ── CLIENT ENGINE SUITE BUNDLE ── */}
+      <section className="py-24 relative overflow-hidden" style={{ background: "oklch(0.11 0.010 260)" }}>
+        <div className="absolute inset-0 dot-grid" style={{ opacity: 0.12 }} />
+        {/* Blue glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-48 rounded-full blur-3xl"
+          style={{ background: "oklch(0.60 0.20 255 / 0.06)" }} />
+        <div className="container relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest"
+              style={{ background: "oklch(0.60 0.20 255 / 0.10)", border: "1px solid oklch(0.60 0.20 255 / 0.30)", color: "oklch(0.60 0.20 255)", fontFamily: "Syne, sans-serif" }}>
+              Coming Soon — Bundle
+            </div>
+            <h2 style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", fontFamily: "Syne, sans-serif", fontWeight: 800, color: "oklch(0.95 0.005 260)", letterSpacing: "-0.025em" }}>
+              The Client Engine Suite
+            </h2>
+            <p className="mt-3 text-base mx-auto" style={{ color: "oklch(0.58 0.008 260)", maxWidth: "540px", lineHeight: 1.7 }}>
+              Three tools. One system. Find your people, build your offer, and convert them — without the chaos.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto">
+            {[
+              {
+                num: "01",
+                name: "ICP Scout",
+                tag: "You are here",
+                tagColor: "oklch(0.78 0.18 85)",
+                tagBg: "oklch(0.78 0.18 85 / 0.12)",
+                desc: "Surface your exact ideal clients from public LinkedIn data. Build precision search queries, score leads, and export to CSV — without touching LinkedIn directly.",
+                status: "Live",
+                statusColor: "oklch(0.65 0.18 145)",
+              },
+              {
+                num: "02",
+                name: "Client Engine Builder",
+                tag: "Available now",
+                tagColor: "oklch(0.60 0.20 255)",
+                tagBg: "oklch(0.60 0.20 255 / 0.10)",
+                desc: "Define your ICP architecture, nail your positioning, and build the messaging framework that makes your outreach land. The strategy layer that makes ICP Scout 10x more effective.",
+                status: "Live",
+                statusColor: "oklch(0.65 0.18 145)",
+              },
+              {
+                num: "03",
+                name: "Funnel Builder",
+                tag: "Coming soon",
+                tagColor: "oklch(0.55 0.008 260)",
+                tagBg: "oklch(0.22 0.012 260)",
+                desc: "Convert the leads you find into booked calls and paying clients. Automated follow-up sequences, landing pages, and conversion architecture — built for service-based businesses.",
+                status: "In development",
+                statusColor: "oklch(0.55 0.008 260)",
+              },
+            ].map((tool) => (
+              <div key={tool.num} className="p-6 rounded-xl relative"
+                style={{ background: "oklch(0.16 0.012 260)", border: "1px solid oklch(0.24 0.012 260)" }}>
+                <div className="flex items-start justify-between mb-4">
+                  <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 900, fontSize: "2rem", color: "oklch(0.28 0.012 260)", lineHeight: 1 }}>
+                    {tool.num}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-semibold"
+                    style={{ background: tool.tagBg, color: tool.tagColor, fontFamily: "Syne, sans-serif" }}>
+                    {tool.tag}
+                  </span>
+                </div>
+                <h3 className="mb-2" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.05rem", color: "oklch(0.92 0.005 260)" }}>
+                  {tool.name}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: "oklch(0.55 0.008 260)" }}>
+                  {tool.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 text-center">
+            <p className="text-sm mb-4" style={{ color: "oklch(0.50 0.008 260)" }}>
+              Bundle pricing will be announced when the Funnel Builder launches.
+            </p>
+            <a href="/pricing"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded text-sm font-bold"
+              style={{ background: "oklch(0.22 0.012 260)", color: "oklch(0.72 0.008 260)", border: "1px solid oklch(0.32 0.012 260)", fontFamily: "Syne, sans-serif", textDecoration: "none" }}>
+              View ICP Scout Pricing →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── GOLD RULE ── */}
+      <div className="gold-rule" />
+      {showClarityGuide && <ICPClarityGuide onClose={() => setShowClarityGuide(false)} />}
+
       {/* ── FOOTER ── */}
       <footer className="py-8" style={{ background: "oklch(0.11 0.010 260)", borderTop: "1px solid oklch(0.22 0.012 260)" }}>
         <div className="container flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -414,6 +521,7 @@ export default function Home() {
         </div>
       </footer>
 
+      {showClarityGuide && <ICPClarityGuide onClose={() => setShowClarityGuide(false)} />}
     </div>
   );
 }
