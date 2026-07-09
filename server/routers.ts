@@ -17,6 +17,10 @@ import {
 } from "./db";
 import { apolloEnrich, guessEmail } from "./enrichment";
 
+// Prompt pack PDF — served after successful payment
+const PROMPT_PACK_PDF_PATH = "/manus-storage/ICP_Scout_Outreach_System_3273c7b1.pdf";
+const PROMPT_PACK_PRICE = 4900; // $49.00 in cents
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", { apiVersion: "2026-06-24.dahlia" });
 
 // Stripe Price IDs — set via env after creating products in Stripe dashboard
@@ -93,6 +97,65 @@ export const appRouter = router({
       });
       return { url: session.url };
     }),
+  }),
+
+  // ── Prompt Pack (one-time $49 purchase) ──────────────────────────────────
+  promptPack: router({
+    createCheckout: protectedProcedure.mutation(async ({ ctx }) => {
+      const sub = await getOrCreateSubscription(ctx.user.id);
+      let customerId = sub.stripeCustomerId ?? undefined;
+
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: ctx.user.email ?? undefined,
+          name: ctx.user.name ?? undefined,
+          metadata: { userId: String(ctx.user.id) },
+        });
+        customerId = customer.id;
+        await updateSubscription(ctx.user.id, { stripeCustomerId: customerId });
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ["card"],
+        line_items: [{
+          price_data: {
+            currency: "usd",
+            unit_amount: PROMPT_PACK_PRICE,
+            product_data: {
+              name: "Plug-and-Play Outreach System",
+              description: "3 AI prompts that turn your ICP lead list into a personalized, article-backed email drip campaign — in 15 minutes flat.",
+              images: [],
+            },
+          },
+          quantity: 1,
+        }],
+        mode: "payment",
+        success_url: `${process.env.VITE_APP_URL ?? "https://localhost:3000"}/download?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.VITE_APP_URL ?? "https://localhost:3000"}/pricing`,
+        metadata: { userId: String(ctx.user.id), product: "prompt_pack" },
+      });
+
+      return { url: session.url };
+    }),
+
+    verifyAndGetDownload: protectedProcedure
+      .input(z.object({ sessionId: z.string() }))
+      .query(async ({ ctx, input }) => {
+        const session = await stripe.checkout.sessions.retrieve(input.sessionId);
+        const paid = session.payment_status === "paid";
+        const isOwner = session.metadata?.userId === String(ctx.user.id);
+        const isPromptPack = session.metadata?.product === "prompt_pack";
+
+        if (!paid || !isOwner || !isPromptPack) {
+          throw new Error("Payment not verified or session does not belong to this user.");
+        }
+
+        return {
+          downloadUrl: PROMPT_PACK_PDF_PATH,
+          fileName: "ICP_Scout_Plug_and_Play_Outreach_System.pdf",
+        };
+      }),
   }),
 
   // ── Leads ─────────────────────────────────────────────────────────────────

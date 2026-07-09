@@ -82,3 +82,41 @@ export const enrichmentJobs = mysqlTable("enrichment_jobs", {
 
 export type EnrichmentJob = typeof enrichmentJobs.$inferSelect;
 export type InsertEnrichmentJob = typeof enrichmentJobs.$inferInsert;
+
+// ── ICP Profiles ───────────────────────────────────────────────────────────
+export const icpProfiles = mysqlTable("icp_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  name: varchar("name", { length: 128 }).notNull(),
+  isActive: boolean("isActive").default(false).notNull(),
+  industry: text("industry"),
+  roles: text("roles"),
+  businessSize: text("businessSize"),
+  geography: varchar("geography", { length: 256 }),
+  activeSignals: text("activeSignals"),
+  problemTheyreIn: text("problemTheyreIn"),
+  whatTheyLookLike: text("whatTheyLookLike"),
+  queryState: text("queryState"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IcpProfile = typeof icpProfiles.$inferSelect;
+export type InsertIcpProfile = typeof icpProfiles.$inferInsert;
+
+// ── Deep Research Runs ─────────────────────────────────────────────────────
+export const deepResearchRuns = mysqlTable("deep_research_runs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  icpProfileId: int("icpProfileId"),
+  status: mysqlEnum("status", ["pending", "running", "complete", "failed"]).default("pending").notNull(),
+  icaSnapshot: text("icaSnapshot"),
+  results: text("results"),
+  totalFound: int("totalFound").default(0).notNull(),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DeepResearchRun = typeof deepResearchRuns.$inferSelect;
+export type InsertDeepResearchRun = typeof deepResearchRuns.$inferInsert;

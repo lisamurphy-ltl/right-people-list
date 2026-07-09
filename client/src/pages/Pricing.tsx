@@ -17,8 +17,10 @@ const TIERS = [
       "Basic profile data (name, title, LinkedIn URL)",
       "Relevance scoring",
       "CSV export",
+      "ICP Clarity Guide",
+      "1 saved ICP profile",
     ],
-    locked: ["Unverified emails", "Verified emails", "Phone numbers", "Team seats"],
+    locked: ["Unverified emails", "Verified emails", "Phone numbers", "Deep Research", "Team seats"],
     cta: "Get Started Free",
     highlight: false,
     plan: null,
@@ -34,9 +36,10 @@ const TIERS = [
       "Unverified emails (pattern-matched)",
       "Company domain lookup",
       "150 leads per month",
+      "1 saved ICP profile",
       "Priority support",
     ],
-    locked: ["Verified emails", "Phone numbers", "Team seats"],
+    locked: ["Verified emails", "Phone numbers", "Deep Research", "Team seats"],
     cta: "Start Scout Pro",
     highlight: false,
     plan: "pro",
@@ -52,6 +55,8 @@ const TIERS = [
       "Verified emails via Apollo API",
       "Phone numbers via Apollo API",
       "500 leads per month",
+      "3 saved ICP profiles",
+      "Deep Research — AI finds 100 named leads with bios + contact info",
       "Enrichment status tracking",
     ],
     locked: ["Team seats"],
@@ -68,6 +73,8 @@ const TIERS = [
     features: [
       "Everything in Scout Pro+",
       "Unlimited leads per month",
+      "Unlimited saved ICP profiles",
+      "Deep Research — unlimited AI research runs",
       "Up to 5 team seats",
       "White-label CSV export",
       "Dedicated support",
@@ -81,6 +88,11 @@ const TIERS = [
 
 export default function Pricing() {
   const { isAuthenticated } = useAuth();
+
+  const promptPackMutation = trpc.promptPack.createCheckout.useMutation({
+    onSuccess: (data) => { if (data.url) window.location.href = data.url; },
+    onError: (e) => toast.error(e.message),
+  });
 
   const checkoutMutation = trpc.subscription.createCheckout.useMutation({
     onSuccess: (data) => { if (data.url) window.location.href = data.url; },
@@ -177,6 +189,51 @@ export default function Pricing() {
               </button>
             </div>
           ))}
+        </div>
+
+        {/* Prompt Pack Add-On */}
+        <div className="mt-12 max-w-2xl mx-auto">
+          <div className="p-7 rounded-xl relative overflow-hidden" style={{ background: "oklch(0.18 0.012 260)", border: "2px solid oklch(0.78 0.18 85 / 0.35)" }}>
+            {/* Gold glow */}
+            <div className="absolute top-0 right-0 w-64 h-32 blur-3xl rounded-full pointer-events-none" style={{ background: "oklch(0.78 0.18 85 / 0.07)" }} />
+            <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              <div className="flex-1">
+                <div className="inline-flex items-center gap-1.5 mb-2 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest" style={{ background: "oklch(0.78 0.18 85 / 0.12)", border: "1px solid oklch(0.78 0.18 85 / 0.35)", color: "oklch(0.78 0.18 85)", fontFamily: "Syne, sans-serif" }}>
+                  One-Time Add-On
+                </div>
+                <h3 className="mb-1 text-xl" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", letterSpacing: "-0.02em" }}>
+                  Plug-and-Play Outreach System
+                </h3>
+                <p className="text-sm leading-relaxed mb-3" style={{ color: "oklch(0.62 0.008 260)" }}>
+                  3 AI prompts that turn your lead CSV into a personalized, article-backed email drip campaign — in 15 minutes. Drop your CSV into Manus, ChatGPT, or Claude and get outreach copy that doesn't sound like everyone else's.
+                </p>
+                <div className="flex flex-wrap gap-3 text-xs" style={{ color: "oklch(0.55 0.008 260)" }}>
+                  <span>✓ Article Finder Prompt</span>
+                  <span>✓ Link Verifier Prompt</span>
+                  <span>✓ 3-Touch Email Drip Prompt</span>
+                  <span>✓ Step-by-step guide</span>
+                </div>
+              </div>
+              <div className="flex flex-col items-center gap-2 shrink-0">
+                <div className="text-center mb-1">
+                  <span style={{ fontSize: "2rem", fontFamily: "Syne, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>$49</span>
+                  <p className="text-xs mt-0.5" style={{ color: "oklch(0.50 0.008 260)" }}>one-time</p>
+                </div>
+                <button
+                  onClick={() => {
+                    if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+                    promptPackMutation.mutate();
+                  }}
+                  disabled={promptPackMutation.isPending}
+                  className="px-6 py-2.5 rounded font-bold text-sm whitespace-nowrap transition-all"
+                  style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif" }}
+                >
+                  {promptPackMutation.isPending ? "Loading..." : "Get the Prompts →"}
+                </button>
+                <p className="text-xs" style={{ color: "oklch(0.40 0.008 260)" }}>Instant PDF download</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Legal compliance note */}
