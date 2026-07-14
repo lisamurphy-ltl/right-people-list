@@ -161,7 +161,7 @@ export default function Pricing() {
 
               <div className="flex-1 mb-6 space-y-2">
                 {tier.features.map(f => (
-                  <div key={f} className="flex items-start gap-2 text-sm">
+                  <div key={f} className="flex items-start gap-2 text-sm min-w-0">
                     <Check size={14} style={{ color: "oklch(0.65 0.18 145)", marginTop: "2px", flexShrink: 0 }} />
                     <span style={{ color: "oklch(0.75 0.008 260)" }}>{f}</span>
                   </div>
@@ -241,7 +241,7 @@ export default function Pricing() {
           <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.60 0.20 255)", fontFamily: "Syne, sans-serif" }}>
             <Zap size={11} style={{ display: "inline", marginRight: "4px" }} />Legal & Ethical Use
           </p>
-          <p className="text-sm leading-relaxed" style={{ color: "oklch(0.58 0.008 260)" }}>
+          <p className="text-sm leading-relaxed break-words" style={{ color: "oklch(0.58 0.008 260)" }}>
             ICP Scout surfaces <strong style={{ color: "oklch(0.75 0.008 260)" }}>publicly available data only</strong> — profiles visible to anyone on the open internet. Scraping public data is legal in the US under the hiQ v. LinkedIn ruling (9th Circuit, 2022). Email enrichment via Apollo uses their licensed B2B database. All outreach must comply with CAN-SPAM: include a physical address, provide an unsubscribe option, and honor opt-outs within 10 business days. GDPR applies to EU contacts — ICP Scout targets US-based prospects by default.
           </p>
         </div>

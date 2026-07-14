@@ -114,7 +114,7 @@ export default function Home() {
             ICP<span style={{ color: "oklch(0.78 0.18 85)" }}>Scout</span>
           </span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           <a href="/pricing" style={{ color: "oklch(0.65 0.008 260)", fontFamily: "Syne, sans-serif", fontWeight: 600, fontSize: "0.875rem", textDecoration: "none" }}>Pricing</a>
           <a href={isAuthenticated ? "/dashboard" : getLoginUrl()}
             style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, background: "oklch(0.22 0.012 260)", color: "oklch(0.80 0.008 260)", borderRadius: "0.375rem", padding: "0.5rem 1rem", textDecoration: "none", border: "1px solid oklch(0.32 0.012 260)", fontSize: "0.875rem" }}>
@@ -339,32 +339,32 @@ export default function Home() {
             {[
               {
                 step: "1",
-                title: "Run the Python Script",
-                body: "Download the Python scraper script. It automates the Google search, extracts names, headlines, and LinkedIn URLs, scores each lead High/Medium/Low, and exports a CSV ready for Google Sheets.",
-                code: "pip install requests beautifulsoup4\npython linkedin_icp_scraper.py",
+                title: "Build Your ICP Query",
+                body: "Use the query builder above to select your target roles, industries, pain keywords, and location. Your precision Google search string generates in real time — no code, no setup required.",
+                code: null,
                 link: null,
                 linkLabel: null,
               },
               {
                 step: "2",
-                title: "Add a Proxy to Scale",
-                body: "Google will eventually block your IP if you run the script raw. Plug in a ScraperAPI key to rotate IPs automatically. They have a free tier that handles hundreds of requests.",
-                code: 'SCRAPER_API_KEY = "your_key_here"',
-                link: "https://www.scraperapi.com/",
-                linkLabel: "Get ScraperAPI Free →",
+                title: "ICP Scout Finds Your Leads",
+                body: "Sign up and ICP Scout runs your search automatically every morning at 5 AM your time. Leads are scored High / Medium / Low and waiting in your dashboard before you start your day.",
+                code: null,
+                link: null,
+                linkLabel: null,
               },
               {
                 step: "3",
-                title: "Enrich with Verified Emails",
-                body: "The script collects LinkedIn URLs. Feed that CSV into Apollo.io or Hunter.io to get verified email addresses. Both have free tiers that cover hundreds of lookups per month.",
+                title: "Get Verified Emails & Phone Numbers",
+                body: "Upgrade to Pro+ and every lead is enriched with a verified email and phone number — confirmed deliverable, not pattern-guessed. No third-party tools to manage, no extra accounts to set up.",
                 code: null,
-                link: "https://apollo.io",
-                linkLabel: "Try Apollo.io Free →",
+                link: "/pricing",
+                linkLabel: "See Pro+ Features →",
               },
               {
                 step: "4",
-                title: "Import to Your CRM & Outreach",
-                body: "Your final CSV has Name, Title, LinkedIn URL, Email, and Relevance Score. Import it into any CRM or outreach tool. Filter by 'High' relevance first — those are your warmest targets.",
+                title: "Export & Outreach",
+                body: "Download your leads as a clean CSV — Name, Title, LinkedIn URL, Email, Phone, and Relevance Score. Import into any CRM or outreach tool. Start with High-score leads every time.",
                 code: null,
                 link: null,
                 linkLabel: null,
@@ -373,7 +373,7 @@ export default function Home() {
               <div key={card.step} className="p-6 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
                 <div className="flex items-start gap-4">
                   <span className="step-badge">{card.step}</span>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 overflow-hidden">
                     <h3 className="mb-2 text-base" style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, color: "oklch(0.92 0.005 260)" }}>{card.title}</h3>
                     <p className="text-sm leading-relaxed mb-3" style={{ color: "oklch(0.60 0.008 260)" }}>{card.body}</p>
                     {card.code && (
