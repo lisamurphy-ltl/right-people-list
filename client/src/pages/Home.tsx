@@ -109,9 +109,10 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
         style={{ background: "oklch(0.13 0.012 260 / 0.9)", backdropFilter: "blur(12px)", borderBottom: "1px solid oklch(0.22 0.012 260)" }}>
         <div className="flex items-center gap-3">
-          <img src="/logo.svg" alt="The Right-People List Logo" className="w-8 h-8 rounded" />
-          <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.1rem", color: "oklch(0.92 0.005 260)", letterSpacing: "-0.02em" }}>
-            The <span style={{ color: "oklch(0.78 0.18 85)" }}>Right</span>-People List
+          <img src="/logo.png" alt="The Right-People List Logo" className="w-9 h-9 rounded-full" style={{ boxShadow: "0 0 16px oklch(0.78 0.18 85 / 0.4)" }} />
+          <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.05rem", letterSpacing: "-0.01em" }}>
+            <span style={{ color: "oklch(0.92 0.005 260)" }}>The </span>
+            <span className="text-chrome-gold">Right-People List</span>
           </span>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -128,14 +129,11 @@ export default function Home() {
       </nav>
 
       {/* ── HERO ── */}
-      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-        {/* Background gradient (placeholder until a hero photo is supplied) */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 25% 20%, oklch(0.22 0.05 255 / 0.35) 0%, transparent 55%), radial-gradient(circle at 80% 75%, oklch(0.30 0.10 85 / 0.20) 0%, transparent 50%)" }} />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, oklch(0.13 0.012 260 / 0.85) 0%, oklch(0.13 0.012 260 / 0.60) 50%, oklch(0.13 0.012 260 / 0.80) 100%)" }} />
-        </div>
-        {/* Dot grid overlay */}
-        <div className="absolute inset-0 dot-grid" style={{ opacity: 0.3 }} />
+      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden starfield">
+        {/* Drifting glow orbs, matching the logo's light bursts */}
+        <div className="glow-orb glow-orb-gold glow-orb-drift" style={{ width: 420, height: 420, top: "-8%", left: "8%" }} />
+        <div className="glow-orb glow-orb-blue glow-orb-drift" style={{ width: 380, height: 380, bottom: "-10%", right: "5%", animationDelay: "-6s" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, oklch(0.13 0.012 260 / 0.55) 0%, oklch(0.13 0.012 260 / 0.35) 50%, oklch(0.10 0.014 260 / 0.65) 100%)" }} />
 
         <div className="container relative z-10 py-24">
           <div className="max-w-3xl">
@@ -146,7 +144,7 @@ export default function Home() {
 
             <h1 className="fade-up fade-up-2 mb-6" style={{ fontSize: "clamp(2.4rem, 6vw, 4rem)", fontFamily: "Syne, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1.08, letterSpacing: "-0.03em" }}>
               Stop guessing.<br />
-              <span style={{ color: "oklch(0.78 0.18 85)" }}>Start finding the people</span><br />
+              <span className="text-chrome-gold">Start finding the people</span><br />
               who actually need you.
             </h1>
 
@@ -391,14 +389,12 @@ export default function Home() {
       <div className="gold-rule" />
 
       {/* ── CTA BANNER ── */}
-      <section className="py-20 relative overflow-hidden" style={{ background: "oklch(0.13 0.012 260)" }}>
-        <div className="absolute inset-0 dot-grid" style={{ opacity: 0.2 }} />
-        {/* Gold glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-40 rounded-full blur-3xl" style={{ background: "oklch(0.78 0.18 85 / 0.08)" }} />
+      <section className="py-24 relative overflow-hidden starfield">
+        <div className="glow-orb glow-orb-gold glow-orb-drift" style={{ width: 340, height: 340, top: "20%", left: "50%", transform: "translateX(-50%)" }} />
         <div className="container relative z-10 text-center">
           <h2 className="mb-4" style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", fontFamily: "Syne, sans-serif", fontWeight: 800, color: "oklch(0.95 0.005 260)", letterSpacing: "-0.025em" }}>
             Your next client is already on LinkedIn.<br />
-            <span style={{ color: "oklch(0.78 0.18 85)" }}>Go get them.</span>
+            <span className="text-chrome-gold">Go get them.</span>
           </h2>
           <p className="mb-8 text-base" style={{ color: "oklch(0.58 0.008 260)", maxWidth: "460px", margin: "0 auto 2rem" }}>
             Build your query, run the search, and start prospecting with precision. No guessing. No wasted outreach.
@@ -505,9 +501,9 @@ export default function Home() {
       <footer className="py-8" style={{ background: "oklch(0.11 0.010 260)", borderTop: "1px solid oklch(0.22 0.012 260)" }}>
         <div className="container flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <img src="/logo.svg" alt="The Right-People List" className="w-6 h-6 rounded" />
+            <img src="/logo.png" alt="The Right-People List" className="w-6 h-6 rounded" />
             <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "oklch(0.55 0.005 260)" }}>
-              The <span style={{ color: "oklch(0.78 0.18 85)" }}>Right</span>-People List
+              The <span className="text-chrome-gold">Right-People List</span>
             </span>
           </div>
           <p className="text-xs text-center" style={{ color: "oklch(0.40 0.005 260)" }}>

@@ -58,7 +58,7 @@ export default function Login() {
       <div className="w-full max-w-md p-8 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
         <div className="mb-8 text-center">
           <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.3rem", color: "oklch(0.92 0.005 260)", letterSpacing: "-0.02em" }}>
-            The <span style={{ color: "oklch(0.78 0.18 85)" }}>Right</span>-People List
+            The <span className="text-chrome-gold">Right-People List</span>
           </span>
           <h1 className="mt-4" style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "1.5rem", color: "oklch(0.95 0.005 260)" }}>
             {mode === "login" ? "Welcome back" : "Create your account"}
