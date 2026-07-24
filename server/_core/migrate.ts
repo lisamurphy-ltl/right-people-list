@@ -14,7 +14,12 @@ export async function runMigrations() {
   }
 
   const db = drizzle(process.env.DATABASE_URL);
-  const migrationsFolder = path.resolve(import.meta.dirname, "..", "..", "drizzle");
+  // Bundled prod runs from dist/index.js (drizzle/ is a sibling of dist/);
+  // dev runs the source file directly from server/_core/ (two levels deeper).
+  const migrationsFolder =
+    process.env.NODE_ENV === "production"
+      ? path.resolve(import.meta.dirname, "..", "drizzle")
+      : path.resolve(import.meta.dirname, "..", "..", "drizzle");
 
   console.log("[Migrate] Applying pending migrations from", migrationsFolder);
   await migrate(db, { migrationsFolder });
