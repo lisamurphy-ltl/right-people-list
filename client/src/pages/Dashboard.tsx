@@ -114,7 +114,7 @@ export default function Dashboard() {
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
         style={{ background: "oklch(0.13 0.012 260 / 0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid oklch(0.22 0.012 260)" }}>
         <a href="/" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.1rem", color: "oklch(0.92 0.005 260)", textDecoration: "none", letterSpacing: "-0.02em" }}>
-          ICP<span style={{ color: "oklch(0.78 0.18 85)" }}>Scout</span>
+          The <span style={{ color: "oklch(0.78 0.18 85)" }}>Right</span>-People List
         </a>
         <div className="flex items-center gap-3">
           <span className="text-sm px-3 py-1 rounded-full" style={{ background: "oklch(0.20 0.012 260)", color: PLAN_COLOR[plan], border: `1px solid ${PLAN_COLOR[plan]}40`, fontFamily: "Syne, sans-serif", fontWeight: 700 }}>

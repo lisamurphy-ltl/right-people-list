@@ -1,4 +1,4 @@
-# ICP Scout — Build Roadmap
+# The Right-People List — Build Roadmap
 
 **Version:** 1.0  
 **Last Updated:** July 2026
@@ -13,7 +13,7 @@ Read PRD.md for feature specs. Read ARCHITECTURE.md for technical design. This d
 |---|---|---|
 | Home page with ICP query builder | ✅ Done | Tag selector for roles, industries, pain keywords, location. Real-time query generation. |
 | ICP Clarity Guide modal | ✅ Done | 4-step ICP definition walkthrough. Triggered from Home page. |
-| Client Engine Suite bundle teaser | ✅ Done | ICP Scout + Client Engine Builder + Funnel Builder section on Home page. |
+| Client Engine Suite bundle teaser | ✅ Done | The Right-People List + Client Engine Builder + Funnel Builder section on Home page. |
 | Manus OAuth authentication | ✅ Done | Login/logout, session cookie, `useAuth()` hook. |
 | Lead Dashboard | ✅ Done | Lead list, usage meter, monthly reset date, manual add, relevance score display. |
 | Paywall gate | ✅ Done | Checks auth + monthly usage limit. Unauthenticated and over-limit users see upgrade CTA. |

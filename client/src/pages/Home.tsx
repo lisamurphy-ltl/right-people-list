@@ -109,9 +109,9 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
         style={{ background: "oklch(0.13 0.012 260 / 0.9)", backdropFilter: "blur(12px)", borderBottom: "1px solid oklch(0.22 0.012 260)" }}>
         <div className="flex items-center gap-3">
-          <img src="/manus-storage/logo-icon_1f1861b3.png" alt="ICP Scout Logo" className="w-8 h-8 rounded" />
+          <img src="/logo.svg" alt="The Right-People List Logo" className="w-8 h-8 rounded" />
           <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.1rem", color: "oklch(0.92 0.005 260)", letterSpacing: "-0.02em" }}>
-            ICP<span style={{ color: "oklch(0.78 0.18 85)" }}>Scout</span>
+            The <span style={{ color: "oklch(0.78 0.18 85)" }}>Right</span>-People List
           </span>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -129,14 +129,9 @@ export default function Home() {
 
       {/* ── HERO ── */}
       <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-        {/* Background image */}
+        {/* Background gradient (placeholder until a hero photo is supplied) */}
         <div className="absolute inset-0">
-          <img
-            src="/manus-storage/hero-bg_48242f78.png"
-            alt=""
-            className="w-full h-full object-cover"
-            style={{ opacity: 0.55 }}
-          />
+          <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 25% 20%, oklch(0.22 0.05 255 / 0.35) 0%, transparent 55%), radial-gradient(circle at 80% 75%, oklch(0.30 0.10 85 / 0.20) 0%, transparent 50%)" }} />
           <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, oklch(0.13 0.012 260 / 0.85) 0%, oklch(0.13 0.012 260 / 0.60) 50%, oklch(0.13 0.012 260 / 0.80) 100%)" }} />
         </div>
         {/* Dot grid overlay */}
@@ -347,8 +342,8 @@ export default function Home() {
               },
               {
                 step: "2",
-                title: "ICP Scout Finds Your Leads",
-                body: "Sign up and ICP Scout runs your search automatically every morning at 5 AM your time. Leads are scored High / Medium / Low and waiting in your dashboard before you start your day.",
+                title: "The Right-People List Finds Your Leads",
+                body: "Sign up and The Right-People List runs your search automatically every morning at 5 AM your time. Leads are scored High / Medium / Low and waiting in your dashboard before you start your day.",
                 code: null,
                 link: null,
                 linkLabel: null,
@@ -439,7 +434,7 @@ export default function Home() {
             {[
               {
                 num: "01",
-                name: "ICP Scout",
+                name: "The Right-People List",
                 tag: "You are here",
                 tagColor: "oklch(0.78 0.18 85)",
                 tagBg: "oklch(0.78 0.18 85 / 0.12)",
@@ -453,7 +448,7 @@ export default function Home() {
                 tag: "Available now",
                 tagColor: "oklch(0.60 0.20 255)",
                 tagBg: "oklch(0.60 0.20 255 / 0.10)",
-                desc: "Define your ICP architecture, nail your positioning, and build the messaging framework that makes your outreach land. The strategy layer that makes ICP Scout 10x more effective.",
+                desc: "Define your ICP architecture, nail your positioning, and build the messaging framework that makes your outreach land. The strategy layer that makes The Right-People List 10x more effective.",
                 status: "Live",
                 statusColor: "oklch(0.65 0.18 145)",
               },
@@ -496,7 +491,7 @@ export default function Home() {
             <a href="/pricing"
               className="inline-flex items-center gap-2 px-6 py-3 rounded text-sm font-bold"
               style={{ background: "oklch(0.22 0.012 260)", color: "oklch(0.72 0.008 260)", border: "1px solid oklch(0.32 0.012 260)", fontFamily: "Syne, sans-serif", textDecoration: "none" }}>
-              View ICP Scout Pricing →
+              View The Right-People List Pricing →
             </a>
           </div>
         </div>
@@ -510,9 +505,9 @@ export default function Home() {
       <footer className="py-8" style={{ background: "oklch(0.11 0.010 260)", borderTop: "1px solid oklch(0.22 0.012 260)" }}>
         <div className="container flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <img src="/manus-storage/logo-icon_1f1861b3.png" alt="ICP Scout" className="w-6 h-6 rounded" />
+            <img src="/logo.svg" alt="The Right-People List" className="w-6 h-6 rounded" />
             <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "oklch(0.55 0.005 260)" }}>
-              ICP<span style={{ color: "oklch(0.78 0.18 85)" }}>Scout</span>
+              The <span style={{ color: "oklch(0.78 0.18 85)" }}>Right</span>-People List
             </span>
           </div>
           <p className="text-xs text-center" style={{ color: "oklch(0.40 0.005 260)" }}>

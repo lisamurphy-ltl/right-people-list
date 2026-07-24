@@ -1,4 +1,4 @@
-# ICP Scout — Product Requirements Document
+# The Right-People List — Product Requirements Document
 
 **Version:** 1.0  
 **Owner:** Lisa Murphy, Limited to Limitless  
@@ -9,11 +9,11 @@
 
 ## 1. Product Vision
 
-ICP Scout is a B2B lead intelligence platform that helps service-based business owners find, enrich, and reach out to their ideal clients — without needing to know how to code, run scripts, or manage proxies. The system does the prospecting work automatically every morning at 5 AM in the user's local timezone, delivering outreach-ready leads with verified contact information and hyper-personalized article hooks directly to their preferred destination (Google Sheets, Notion, or in-app dashboard).
+The Right-People List is a B2B lead intelligence platform that helps service-based business owners find, enrich, and reach out to their ideal clients — without needing to know how to code, run scripts, or manage proxies. The system does the prospecting work automatically every morning at 5 AM in the user's local timezone, delivering outreach-ready leads with verified contact information and hyper-personalized article hooks directly to their preferred destination (Google Sheets, Notion, or in-app dashboard).
 
 The core philosophy: **the value lives in the execution, not the instructions.** All pipeline logic, prompts, ICP filters, and article research runs server-side and is never exposed to the user. Users see results — not machinery.
 
-ICP Scout is the first product in the **Client Engine Suite**, which will eventually bundle ICP Scout + Client Engine Builder + Funnel Builder as a combined offering.
+The Right-People List is the first product in the **Client Engine Suite**, which will eventually bundle The Right-People List + Client Engine Builder + Funnel Builder as a combined offering.
 
 ---
 
@@ -101,7 +101,7 @@ All scrape results are stored in a central `shared_leads` table before being ass
 
 ## 5. BYOK (Bring Your Own Key) — AI Provider Integration
 
-**Philosophy:** ICP Scout never exposes its prompts or pipeline logic. The user's API key is the fuel; the ICP Scout engine is the car. Users see outputs, never prompts.
+**Philosophy:** The Right-People List never exposes its prompts or pipeline logic. The user's API key is the fuel; the The Right-People List engine is the car. Users see outputs, never prompts.
 
 ### 5.1 Supported Providers
 
@@ -149,11 +149,11 @@ Users choose where their enriched leads are delivered. Set once during onboardin
 
 | Destination | Setup Required | Notes |
 |---|---|---|
-| **In-App Dashboard** (default) | None | Leads stored in ICP Scout DB. CSV export available. |
+| **In-App Dashboard** (default) | None | Leads stored in The Right-People List DB. CSV export available. |
 | **Google Sheets** | One-time Google OAuth connection | New leads append to a designated sheet. User provides Sheet ID or creates a new one via the tool. |
 | **Notion** | Paste Notion integration token + database ID | Leads write directly to a Notion database. User creates the integration in Notion settings and pastes the token. |
 
-**Data retention:** Leads older than 90 days auto-delete from the ICP Scout database. Users who want permanent storage should connect Google Sheets or Notion. This keeps the database lean and reduces liability.
+**Data retention:** Leads older than 90 days auto-delete from the The Right-People List database. Users who want permanent storage should connect Google Sheets or Notion. This keeps the database lean and reduces liability.
 
 ---
 
@@ -249,7 +249,7 @@ Email is not expected from directory sources. The pipeline: (1) extracts the com
 | 90-day data retention auto-delete | Medium | Cron job or scheduled cleanup |
 | PDF Prompt Pack rebuild (Typst) | Medium | Current PDF is low quality — needs professional rebuild |
 | Exclusivity tracking for Agency leads | Low | served_exclusively flag + 30-day lock |
-| Client Engine Suite bundle page | Low | Cross-sell ICP Scout + Client Engine Builder + Funnel Builder |
+| Client Engine Suite bundle page | Low | Cross-sell The Right-People List + Client Engine Builder + Funnel Builder |
 | Vercel deployment config | Low | vercel.json + serverless function wrapper for Express |
 
 ---

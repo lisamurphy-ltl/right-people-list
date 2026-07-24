@@ -1,4 +1,4 @@
-# ICP Scout — Architecture Document
+# The Right-People List — Architecture Document
 
 **Version:** 1.0  
 **Last Updated:** July 2026

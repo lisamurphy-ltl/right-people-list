@@ -8,11 +8,13 @@ import Home from "./pages/Home";
 import Download from "./pages/Download";
 import Dashboard from "./pages/Dashboard";
 import Pricing from "./pages/Pricing";
+import Login from "./pages/Login";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/login"} component={Login} />
       <Route path={"/download"} component={Download} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/pricing"} component={Pricing} />

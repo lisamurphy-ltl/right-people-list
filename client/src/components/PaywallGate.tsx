@@ -113,7 +113,7 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
               {!isAuthenticated ? (
                 <>
                   <p className="text-sm leading-relaxed mb-5" style={{ color: "oklch(0.65 0.008 260)" }}>
-                    ICP Scout is <strong style={{ color: "oklch(0.90 0.005 260)" }}>free to start</strong> — 25 leads per month, no credit card required. Sign in to track your leads, save your searches, and unlock enrichment when you're ready.
+                    The Right-People List is <strong style={{ color: "oklch(0.90 0.005 260)" }}>free to start</strong> — 25 leads per month, no credit card required. Sign in to track your leads, save your searches, and unlock enrichment when you're ready.
                   </p>
                   <div className="p-4 rounded-lg mb-5"
                     style={{ background: "oklch(0.78 0.18 85 / 0.08)", border: "1px solid oklch(0.78 0.18 85 / 0.25)" }}>

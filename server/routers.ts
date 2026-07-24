@@ -1,27 +1,54 @@
+import { randomUUID } from "crypto";
 import Stripe from "stripe";
 import { z } from "zod";
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
+import { hashPassword, verifyPassword } from "./_core/password";
+import { sdk } from "./_core/sdk";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import {
   createLead,
+  createUser,
   getLeadById,
   getLeadsByUser,
   getLeadsCount,
   getOrCreateSubscription,
+  getUserByEmail,
   incrementLeadsUsed,
   PLAN_LIMITS,
+  touchLastSignedIn,
   updateLead,
   updateSubscription,
 } from "./db";
 import { apolloEnrich, guessEmail } from "./enrichment";
 
+const EMAIL_SCHEMA = z.string().trim().toLowerCase().email();
+const PASSWORD_SCHEMA = z.string().min(8, "Password must be at least 8 characters");
+
+async function issueSession(ctx: { req: any; res: any }, userId: number) {
+  const sessionToken = await sdk.createSessionToken(userId, { expiresInMs: ONE_YEAR_MS });
+  const cookieOptions = getSessionCookieOptions(ctx.req);
+  ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+}
+
 // Prompt pack PDF — served after successful payment
-const PROMPT_PACK_PDF_PATH = "/manus-storage/ICP_Scout_Outreach_System_3273c7b1.pdf";
+// TODO: drop the real PDF at client/public/downloads/right-people-list-outreach-system.pdf
+const PROMPT_PACK_PDF_PATH = "/downloads/right-people-list-outreach-system.pdf";
 const PROMPT_PACK_PRICE = 4900; // $49.00 in cents
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", { apiVersion: "2026-06-24.dahlia" });
+// Lazily instantiated so a missing/invalid key fails only the Stripe-dependent
+// procedures that call getStripe(), not the whole server at boot.
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("Stripe is not configured (missing STRIPE_SECRET_KEY).");
+  }
+  if (!_stripe) {
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2026-06-24.dahlia" });
+  }
+  return _stripe;
+}
 
 // Stripe Price IDs — set via env after creating products in Stripe dashboard
 const PRICE_IDS = {
@@ -35,6 +62,43 @@ export const appRouter = router({
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+
+    signup: publicProcedure
+      .input(z.object({
+        email: EMAIL_SCHEMA,
+        password: PASSWORD_SCHEMA,
+        name: z.string().trim().min(1).max(256).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const existing = await getUserByEmail(input.email);
+        if (existing) throw new Error("An account with this email already exists.");
+
+        const passwordHash = await hashPassword(input.password);
+        const user = await createUser({
+          openId: randomUUID(),
+          email: input.email,
+          passwordHash,
+          name: input.name ?? null,
+        });
+        if (!user) throw new Error("Failed to create account.");
+
+        await issueSession(ctx, user.id);
+        return user;
+      }),
+
+    login: publicProcedure
+      .input(z.object({ email: EMAIL_SCHEMA, password: z.string().min(1) }))
+      .mutation(async ({ ctx, input }) => {
+        const user = await getUserByEmail(input.email);
+        if (!user || !(await verifyPassword(input.password, user.passwordHash))) {
+          throw new Error("Invalid email or password.");
+        }
+
+        await touchLastSignedIn(user.id);
+        await issueSession(ctx, user.id);
+        return user;
+      }),
+
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
@@ -66,7 +130,7 @@ export const appRouter = router({
         let customerId = sub.stripeCustomerId ?? undefined;
 
         if (!customerId) {
-          const customer = await stripe.customers.create({
+          const customer = await getStripe().customers.create({
             email: ctx.user.email ?? undefined,
             name: ctx.user.name ?? undefined,
             metadata: { userId: String(ctx.user.id) },
@@ -75,7 +139,7 @@ export const appRouter = router({
           await updateSubscription(ctx.user.id, { stripeCustomerId: customerId });
         }
 
-        const session = await stripe.checkout.sessions.create({
+        const session = await getStripe().checkout.sessions.create({
           customer: customerId,
           payment_method_types: ["card"],
           line_items: [{ price: priceId, quantity: 1 }],
@@ -91,7 +155,7 @@ export const appRouter = router({
     createPortal: protectedProcedure.mutation(async ({ ctx }) => {
       const sub = await getOrCreateSubscription(ctx.user.id);
       if (!sub.stripeCustomerId) throw new Error("No Stripe customer found");
-      const session = await stripe.billingPortal.sessions.create({
+      const session = await getStripe().billingPortal.sessions.create({
         customer: sub.stripeCustomerId,
         return_url: `${process.env.VITE_APP_URL ?? "https://localhost:3000"}/dashboard`,
       });
@@ -106,7 +170,7 @@ export const appRouter = router({
       let customerId = sub.stripeCustomerId ?? undefined;
 
       if (!customerId) {
-        const customer = await stripe.customers.create({
+        const customer = await getStripe().customers.create({
           email: ctx.user.email ?? undefined,
           name: ctx.user.name ?? undefined,
           metadata: { userId: String(ctx.user.id) },
@@ -115,7 +179,7 @@ export const appRouter = router({
         await updateSubscription(ctx.user.id, { stripeCustomerId: customerId });
       }
 
-      const session = await stripe.checkout.sessions.create({
+      const session = await getStripe().checkout.sessions.create({
         customer: customerId,
         payment_method_types: ["card"],
         line_items: [{
@@ -142,7 +206,7 @@ export const appRouter = router({
     verifyAndGetDownload: protectedProcedure
       .input(z.object({ sessionId: z.string() }))
       .query(async ({ ctx, input }) => {
-        const session = await stripe.checkout.sessions.retrieve(input.sessionId);
+        const session = await getStripe().checkout.sessions.retrieve(input.sessionId);
         const paid = session.payment_status === "paid";
         const isOwner = session.metadata?.userId === String(ctx.user.id);
         const isPromptPack = session.metadata?.product === "prompt_pack";

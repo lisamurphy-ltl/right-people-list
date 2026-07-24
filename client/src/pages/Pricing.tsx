@@ -117,7 +117,7 @@ export default function Pricing() {
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
         style={{ background: "oklch(0.13 0.012 260 / 0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid oklch(0.22 0.012 260)" }}>
         <a href="/" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.1rem", color: "oklch(0.92 0.005 260)", textDecoration: "none", letterSpacing: "-0.02em" }}>
-          ICP<span style={{ color: "oklch(0.78 0.18 85)" }}>Scout</span>
+          The <span style={{ color: "oklch(0.78 0.18 85)" }}>Right</span>-People List
         </a>
         <a href={isAuthenticated ? "/dashboard" : getLoginUrl()}
           style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif", fontWeight: 700, padding: "0.5rem 1.25rem", borderRadius: "0.375rem", textDecoration: "none", fontSize: "0.875rem" }}>
@@ -242,7 +242,7 @@ export default function Pricing() {
             <Zap size={11} style={{ display: "inline", marginRight: "4px" }} />Legal & Ethical Use
           </p>
           <p className="text-sm leading-relaxed break-words" style={{ color: "oklch(0.58 0.008 260)" }}>
-            ICP Scout surfaces <strong style={{ color: "oklch(0.75 0.008 260)" }}>publicly available data only</strong> — profiles visible to anyone on the open internet. Scraping public data is legal in the US under the hiQ v. LinkedIn ruling (9th Circuit, 2022). Email enrichment via Apollo uses their licensed B2B database. All outreach must comply with CAN-SPAM: include a physical address, provide an unsubscribe option, and honor opt-outs within 10 business days. GDPR applies to EU contacts — ICP Scout targets US-based prospects by default.
+            The Right-People List surfaces <strong style={{ color: "oklch(0.75 0.008 260)" }}>publicly available data only</strong> — profiles visible to anyone on the open internet. Scraping public data is legal in the US under the hiQ v. LinkedIn ruling (9th Circuit, 2022). Email enrichment via Apollo uses their licensed B2B database. All outreach must comply with CAN-SPAM: include a physical address, provide an unsubscribe option, and honor opt-outs within 10 business days. GDPR applies to EU contacts — The Right-People List targets US-based prospects by default.
           </p>
         </div>
       </div>
