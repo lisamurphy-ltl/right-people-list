@@ -15,9 +15,9 @@ const INDUSTRIES = ["Coaching", "Consulting", "Marketing Agency", "Staffing"];
 const PAIN_KEYWORDS = ["scale", "burnout", "growth", "hiring"];
 
 const PLANS = [
-  { name: "Pro", price: "$47", period: "/mo", features: ["150 leads/month", "Unverified emails", "CSV export"] },
-  { name: "Pro Plus", price: "$127", period: "/mo", features: ["500 leads/month", "Verified emails + phone", "Priority scoring"], highlight: true },
-  { name: "Agency", price: "$297", period: "/mo", features: ["Unlimited leads", "5 team seats", "White-label export"] },
+  { name: "Free", price: "$0", period: "forever", features: ["25 leads/month", "ICP query builder", "CSV export"] },
+  { name: "Paid Plans", price: "From $47", period: "/mo", features: ["Verified emails + phone", "Deep Research", "Choose Pro, Pro+, or Agency"], highlight: true },
+  { name: "Prompt Pack", price: "$49", period: "one-time", features: ["Outreach email prompts", "Works with any plan", "Instant PDF download"] },
 ];
 
 export default function Home() {
@@ -261,7 +261,7 @@ export default function Home() {
                     border: plan.highlight ? "none" : "1px solid oklch(0.32 0.012 260)",
                     fontFamily: "Archivo, sans-serif", textDecoration: "none",
                   }}>
-                  Choose {plan.name}
+                  {plan.name === "Free" ? "Get Started Free" : plan.name === "Paid Plans" ? "Compare Plans" : "Learn More"}
                 </a>
               </div>
             ))}

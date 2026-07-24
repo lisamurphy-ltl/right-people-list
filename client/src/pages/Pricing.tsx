@@ -1,32 +1,29 @@
+import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { Check, Zap } from "lucide-react";
 import { toast } from "sonner";
 
-const TIERS = [
+const FREE_TIER = {
+  name: "Free",
+  price: "$0",
+  period: "forever",
+  leads: "25 leads / month",
+  features: [
+    "ICP query builder",
+    "Google search integration",
+    "Basic profile data (name, title, LinkedIn URL)",
+    "Relevance scoring",
+    "CSV export",
+    "ICP Clarity Guide",
+  ],
+  locked: ["Unverified emails", "Verified emails", "Phone numbers", "Deep Research", "Team seats"],
+};
+
+const PAID_TIERS = [
   {
-    key: "free",
-    name: "Free",
-    price: "$0",
-    period: "forever",
-    leads: "25 leads / month",
-    features: [
-      "ICP query builder",
-      "Google search integration",
-      "Basic profile data (name, title, LinkedIn URL)",
-      "Relevance scoring",
-      "CSV export",
-      "ICP Clarity Guide",
-      "1 saved ICP profile",
-    ],
-    locked: ["Unverified emails", "Verified emails", "Phone numbers", "Deep Research", "Team seats"],
-    cta: "Get Started Free",
-    highlight: false,
-    plan: null,
-  },
-  {
-    key: "pro",
+    key: "pro" as const,
     name: "Scout Pro",
     price: "$47",
     period: "/ month",
@@ -36,16 +33,13 @@ const TIERS = [
       "Unverified emails (pattern-matched)",
       "Company domain lookup",
       "150 leads per month",
-      "1 saved ICP profile",
       "Priority support",
     ],
     locked: ["Verified emails", "Phone numbers", "Deep Research", "Team seats"],
     cta: "Start Scout Pro",
-    highlight: false,
-    plan: "pro",
   },
   {
-    key: "pro_plus",
+    key: "pro_plus" as const,
     name: "Scout Pro+",
     price: "$127",
     period: "/ month",
@@ -55,17 +49,13 @@ const TIERS = [
       "Verified emails via Apollo API",
       "Phone numbers via Apollo API",
       "500 leads per month",
-      "3 saved ICP profiles",
       "Deep Research — AI finds 100 named leads with bios + contact info",
-      "Enrichment status tracking",
     ],
     locked: ["Team seats"],
     cta: "Start Scout Pro+",
-    highlight: true,
-    plan: "pro_plus",
   },
   {
-    key: "agency",
+    key: "agency" as const,
     name: "Agency",
     price: "$297",
     period: "/ month",
@@ -77,17 +67,34 @@ const TIERS = [
       "Deep Research — unlimited AI research runs",
       "Up to 5 team seats",
       "White-label CSV export",
-      "Dedicated support",
     ],
     locked: [],
     cta: "Start Agency",
-    highlight: false,
-    plan: "agency",
   },
 ];
 
+function FeatureList({ features, locked }: { features: string[]; locked: string[] }) {
+  return (
+    <div className="flex-1 mb-6 space-y-2">
+      {features.map(f => (
+        <div key={f} className="flex items-start gap-2 text-sm min-w-0">
+          <Check size={14} style={{ color: "oklch(0.65 0.18 145)", marginTop: "2px", flexShrink: 0 }} />
+          <span style={{ color: "oklch(0.75 0.008 260)" }}>{f}</span>
+        </div>
+      ))}
+      {locked.map(f => (
+        <div key={f} className="flex items-start gap-2 text-sm">
+          <span style={{ color: "oklch(0.48 0.010 260)", marginTop: "2px", flexShrink: 0, fontSize: "0.85rem" }}>✕</span>
+          <span style={{ color: "oklch(0.52 0.008 260)" }}>{f}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Pricing() {
   const { isAuthenticated } = useAuth();
+  const [selectedPaid, setSelectedPaid] = useState<typeof PAID_TIERS[number]["key"]>("pro_plus");
 
   const promptPackMutation = trpc.promptPack.createCheckout.useMutation({
     onSuccess: (data) => { if (data.url) window.location.href = data.url; },
@@ -99,17 +106,16 @@ export default function Pricing() {
     onError: (e) => toast.error(e.message),
   });
 
-  const handleCTA = (plan: string | null) => {
-    if (!plan) {
-      window.location.href = isAuthenticated ? "/dashboard" : getLoginUrl();
-      return;
-    }
-    if (!isAuthenticated) {
-      window.location.href = getLoginUrl();
-      return;
-    }
-    checkoutMutation.mutate({ plan: plan as "pro" | "pro_plus" | "agency" });
+  const handleFreeCTA = () => {
+    window.location.href = isAuthenticated ? "/dashboard" : getLoginUrl();
   };
+
+  const handlePaidCTA = () => {
+    if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+    checkoutMutation.mutate({ plan: selectedPaid });
+  };
+
+  const activeTier = PAID_TIERS.find(t => t.key === selectedPaid)!;
 
   return (
     <div className="min-h-screen" style={{ background: "oklch(0.13 0.012 260)" }}>
@@ -136,103 +142,95 @@ export default function Pricing() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {TIERS.map(tier => (
-            <div key={tier.key} className="relative flex flex-col rounded-xl p-6"
-              style={{
-                background: tier.highlight ? "oklch(0.20 0.015 260)" : "oklch(0.18 0.012 260)",
-                border: `1px solid ${tier.highlight ? "oklch(0.78 0.18 85 / 0.5)" : "oklch(0.26 0.012 260)"}`,
-              }}>
-              {tier.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold"
-                  style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
-                  Most Popular
-                </div>
-              )}
-
-              <div className="mb-5">
-                <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{tier.name}</p>
-                <div className="flex items-baseline gap-1">
-                  <span style={{ fontSize: "2.2rem", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>{tier.price}</span>
-                  <span className="text-sm" style={{ color: "oklch(0.50 0.008 260)" }}>{tier.period}</span>
-                </div>
-                <p className="mt-2 text-xs font-semibold" style={{ color: tier.highlight ? "oklch(0.78 0.18 85)" : "oklch(0.60 0.20 255)" }}>{tier.leads}</p>
+        <div className="grid md:grid-cols-3 gap-5 items-stretch">
+          {/* 1. FREE */}
+          <div className="relative flex flex-col rounded-xl p-6" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
+            <div className="mb-5">
+              <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{FREE_TIER.name}</p>
+              <div className="flex items-baseline gap-1">
+                <span style={{ fontSize: "2.2rem", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>{FREE_TIER.price}</span>
+                <span className="text-sm" style={{ color: "oklch(0.50 0.008 260)" }}>{FREE_TIER.period}</span>
               </div>
+              <p className="mt-2 text-xs font-semibold" style={{ color: "oklch(0.60 0.20 255)" }}>{FREE_TIER.leads}</p>
+            </div>
+            <FeatureList features={FREE_TIER.features} locked={FREE_TIER.locked} />
+            <button onClick={handleFreeCTA} className="w-full py-3 rounded font-bold text-sm transition-all"
+              style={{ background: "oklch(0.24 0.014 260)", color: "oklch(0.80 0.008 260)", border: "1px solid oklch(0.32 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+              Get Started Free
+            </button>
+          </div>
 
-              <div className="flex-1 mb-6 space-y-2">
-                {tier.features.map(f => (
+          {/* 2. PAID PLANS — expandable tier picker */}
+          <div className="relative flex flex-col rounded-xl p-6" style={{ background: "oklch(0.20 0.015 260)", border: "1px solid oklch(0.78 0.18 85 / 0.5)" }}>
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold"
+              style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+              Most Popular
+            </div>
+
+            <div className="mb-4 flex gap-1.5 p-1 rounded-lg" style={{ background: "oklch(0.14 0.012 260)" }}>
+              {PAID_TIERS.map(t => (
+                <button key={t.key} onClick={() => setSelectedPaid(t.key)}
+                  className="flex-1 py-1.5 rounded-md text-xs font-bold transition-all"
+                  style={{
+                    background: selectedPaid === t.key ? "oklch(0.78 0.18 85)" : "transparent",
+                    color: selectedPaid === t.key ? "oklch(0.13 0.012 260)" : "oklch(0.60 0.008 260)",
+                    fontFamily: "Archivo, sans-serif",
+                  }}>
+                  {t.name.replace("Scout ", "")}
+                </button>
+              ))}
+            </div>
+
+            <div className="mb-5">
+              <div className="flex items-baseline gap-1">
+                <span style={{ fontSize: "2.2rem", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>{activeTier.price}</span>
+                <span className="text-sm" style={{ color: "oklch(0.50 0.008 260)" }}>{activeTier.period}</span>
+              </div>
+              <p className="mt-2 text-xs font-semibold" style={{ color: "oklch(0.78 0.18 85)" }}>{activeTier.leads}</p>
+            </div>
+            <FeatureList features={activeTier.features} locked={activeTier.locked} />
+            <button
+              onClick={handlePaidCTA}
+              disabled={checkoutMutation.isPending}
+              className="w-full py-3 rounded font-bold text-sm transition-all"
+              style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+              {checkoutMutation.isPending ? "Loading..." : activeTier.cta}
+            </button>
+          </div>
+
+          {/* 3. PROMPT PACK */}
+          <div className="relative flex flex-col rounded-xl p-6" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
+            <div className="mb-5">
+              <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Archivo, sans-serif" }}>Outreach Prompt Pack</p>
+              <div className="flex items-baseline gap-1">
+                <span style={{ fontSize: "2.2rem", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>$49</span>
+                <span className="text-sm" style={{ color: "oklch(0.50 0.008 260)" }}>one-time</span>
+              </div>
+              <p className="mt-2 text-xs font-semibold" style={{ color: "oklch(0.60 0.20 255)" }}>Works with any plan</p>
+            </div>
+            <div className="flex-1 mb-6">
+              <p className="text-sm leading-relaxed mb-3" style={{ color: "oklch(0.62 0.008 260)" }}>
+                3 AI prompts that turn your lead CSV into a personalized, article-backed email drip campaign — in 15 minutes.
+              </p>
+              <div className="space-y-2">
+                {["Article Finder Prompt", "Link Verifier Prompt", "3-Touch Email Drip Prompt", "Step-by-step guide"].map(f => (
                   <div key={f} className="flex items-start gap-2 text-sm min-w-0">
                     <Check size={14} style={{ color: "oklch(0.65 0.18 145)", marginTop: "2px", flexShrink: 0 }} />
                     <span style={{ color: "oklch(0.75 0.008 260)" }}>{f}</span>
                   </div>
                 ))}
-                {tier.locked.map(f => (
-                  <div key={f} className="flex items-start gap-2 text-sm">
-                    <span style={{ color: "oklch(0.48 0.010 260)", marginTop: "2px", flexShrink: 0, fontSize: "0.85rem" }}>✕</span>
-                    <span style={{ color: "oklch(0.52 0.008 260)" }}>{f}</span>
-                  </div>
-                ))}
-              </div>
-
-              <button
-                onClick={() => handleCTA(tier.plan)}
-                disabled={checkoutMutation.isPending}
-                className="w-full py-3 rounded font-bold text-sm transition-all"
-                style={{
-                  background: tier.highlight ? "oklch(0.78 0.18 85)" : "oklch(0.24 0.014 260)",
-                  color: tier.highlight ? "oklch(0.13 0.012 260)" : "oklch(0.80 0.008 260)",
-                  border: tier.highlight ? "none" : "1px solid oklch(0.32 0.012 260)",
-                  fontFamily: "Archivo, sans-serif",
-                }}
-              >
-                {tier.cta}
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Prompt Pack Add-On */}
-        <div className="mt-12 max-w-2xl mx-auto">
-          <div className="p-7 rounded-xl relative overflow-hidden" style={{ background: "oklch(0.18 0.012 260)", border: "2px solid oklch(0.78 0.18 85 / 0.35)" }}>
-            {/* Gold glow */}
-            <div className="absolute top-0 right-0 w-64 h-32 blur-3xl rounded-full pointer-events-none" style={{ background: "oklch(0.78 0.18 85 / 0.07)" }} />
-            <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <div className="flex-1">
-                <div className="inline-flex items-center gap-1.5 mb-2 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest" style={{ background: "oklch(0.78 0.18 85 / 0.12)", border: "1px solid oklch(0.78 0.18 85 / 0.35)", color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>
-                  One-Time Add-On
-                </div>
-                <h3 className="mb-1 text-xl" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", letterSpacing: "-0.02em" }}>
-                  Plug-and-Play Outreach System
-                </h3>
-                <p className="text-sm leading-relaxed mb-3" style={{ color: "oklch(0.62 0.008 260)" }}>
-                  3 AI prompts that turn your lead CSV into a personalized, article-backed email drip campaign — in 15 minutes. Drop your CSV into Manus, ChatGPT, or Claude and get outreach copy that doesn't sound like everyone else's.
-                </p>
-                <div className="flex flex-wrap gap-3 text-xs" style={{ color: "oklch(0.55 0.008 260)" }}>
-                  <span>✓ Article Finder Prompt</span>
-                  <span>✓ Link Verifier Prompt</span>
-                  <span>✓ 3-Touch Email Drip Prompt</span>
-                  <span>✓ Step-by-step guide</span>
-                </div>
-              </div>
-              <div className="flex flex-col items-center gap-2 shrink-0">
-                <div className="text-center mb-1">
-                  <span style={{ fontSize: "2rem", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>$49</span>
-                  <p className="text-xs mt-0.5" style={{ color: "oklch(0.50 0.008 260)" }}>one-time</p>
-                </div>
-                <button
-                  onClick={() => {
-                    if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
-                    promptPackMutation.mutate();
-                  }}
-                  disabled={promptPackMutation.isPending}
-                  className="px-6 py-2.5 rounded font-bold text-sm whitespace-nowrap transition-all"
-                  style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}
-                >
-                  {promptPackMutation.isPending ? "Loading..." : "Get the Prompts →"}
-                </button>
-                <p className="text-xs" style={{ color: "oklch(0.40 0.008 260)" }}>Instant PDF download</p>
               </div>
             </div>
+            <button
+              onClick={() => {
+                if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+                promptPackMutation.mutate();
+              }}
+              disabled={promptPackMutation.isPending}
+              className="w-full py-3 rounded font-bold text-sm transition-all"
+              style={{ background: "oklch(0.24 0.014 260)", color: "oklch(0.80 0.008 260)", border: "1px solid oklch(0.32 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+              {promptPackMutation.isPending ? "Loading..." : "Get the Prompts →"}
+            </button>
           </div>
         </div>
 
