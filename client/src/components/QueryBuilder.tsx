@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
-import { Copy, Check, Search, ExternalLink } from "lucide-react";
+import { Copy, Check, Loader2, Sparkles } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 
 const ROLES = ["Founder", "Owner", "CEO", "President", "Managing Director", "Principal"];
 const INDUSTRIES = ["Coaching", "Consulting", "Marketing Agency", "PR Agency", "Staffing", "Financial Advisory", "Legal Services", "Accounting", "IT Services", "Real Estate"];
@@ -80,7 +82,20 @@ export default function QueryBuilder() {
   };
 
   const query = buildQuery(roles, industries, pains, location);
-  const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  const utils = trpc.useUtils();
+
+  const searchMutation = trpc.leads.runSearch.useMutation({
+    onSuccess: (data) => {
+      utils.leads.list.invalidate();
+      utils.subscription.get.invalidate();
+      if (data.added > 0) {
+        toast.success(`Found ${data.found} matching profiles — added ${data.added} new leads to your list.`);
+      } else {
+        toast.info(`Found ${data.found} matching profiles, but they're all already in your list.`);
+      }
+    },
+    onError: (e) => toast.error(e.message),
+  });
 
   return (
     <div className="mb-8 p-7 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
@@ -125,17 +140,18 @@ export default function QueryBuilder() {
             <CopyButton text={query} />
           </div>
           <div className="query-block mb-5 min-h-[100px]">{query}</div>
-          <a
-            href={googleUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => searchMutation.mutate({ roles, industries, pains, location })}
+            disabled={searchMutation.isPending}
             className="flex items-center justify-center gap-2 w-full py-3 rounded font-bold text-sm transition-all duration-160"
-            style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", textDecoration: "none" }}
+            style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", opacity: searchMutation.isPending ? 0.7 : 1 }}
           >
-            <Search size={15} /> Run This Search on Google <ExternalLink size={13} />
-          </a>
+            {searchMutation.isPending
+              ? (<><Loader2 size={15} className="animate-spin" /> Finding your leads…</>)
+              : (<><Sparkles size={15} /> Find My Leads</>)}
+          </button>
           <p className="mt-4 text-xs text-center" style={{ color: "oklch(0.45 0.008 260)" }}>
-            Then copy matching profiles into your leads list below.
+            We run the search for you and add matches straight to your list below.
           </p>
         </div>
       </div>

@@ -22,6 +22,15 @@ import {
   updateSubscription,
 } from "./db";
 import { apolloEnrich, guessEmail } from "./enrichment";
+import { searchLinkedInProfiles } from "./leadSearch";
+
+function buildIcpQuery(roles: string[], industries: string[], pains: string[], location: string): string {
+  const roleStr = roles.length > 0 ? `(${roles.map(r => `"${r}"`).join(" OR ")})` : `("Founder" OR "Owner" OR "CEO")`;
+  const indStr = industries.length > 0 ? `(${industries.map(i => `"${i}"`).join(" OR ")})` : `("Consulting" OR "Coaching" OR "Agency")`;
+  const painStr = pains.length > 0 ? `(${pains.slice(0, 5).map(p => `"${p}"`).join(" OR ")})` : `("scale" OR "burnout" OR "growth")`;
+  const locStr = location ? `"${location}"` : `"United States"`;
+  return `site:linkedin.com/in/ ${roleStr} ${indStr} ${painStr} ${locStr}`;
+}
 
 const EMAIL_SCHEMA = z.string().trim().toLowerCase().email();
 const PASSWORD_SCHEMA = z.string().min(8, "Password must be at least 8 characters");
@@ -232,6 +241,52 @@ export const appRouter = router({
         const items = await getLeadsByUser(ctx.user.id, input.limit, input.offset);
         const total = await getLeadsCount(ctx.user.id);
         return { items, total };
+      }),
+
+    runSearch: protectedProcedure
+      .input(z.object({
+        roles: z.array(z.string()),
+        industries: z.array(z.string()),
+        pains: z.array(z.string()),
+        location: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const sub = await getOrCreateSubscription(ctx.user.id);
+        const limits = PLAN_LIMITS[sub.plan];
+        const remaining = limits.leadsPerMonth === 99999
+          ? 25
+          : Math.max(0, limits.leadsPerMonth - sub.leadsUsed);
+
+        if (remaining <= 0) {
+          throw new Error(`Monthly lead limit reached (${limits.leadsPerMonth}). Upgrade to run more searches.`);
+        }
+
+        const query = buildIcpQuery(input.roles, input.industries, input.pains, input.location);
+        const candidates = await searchLinkedInProfiles(query, Math.min(remaining, 10));
+
+        const existing = await getLeadsByUser(ctx.user.id, 1000, 0);
+        const existingUrls = new Set(existing.map(l => l.linkedinUrl));
+
+        const painMatchCount = (text: string | null) =>
+          input.pains.filter(p => text?.toLowerCase().includes(p.toLowerCase())).length;
+
+        let added = 0;
+        for (const c of candidates) {
+          if (existingUrls.has(c.linkedinUrl)) continue;
+          if (added >= remaining) break;
+          await createLead({
+            userId: ctx.user.id,
+            fullName: c.fullName,
+            title: c.title ?? undefined,
+            linkedinUrl: c.linkedinUrl,
+            relevanceScore: painMatchCount(c.title) >= 2 ? "high" : painMatchCount(c.title) === 1 ? "medium" : "low",
+            searchQuery: query,
+          });
+          added++;
+        }
+        if (added > 0) await incrementLeadsUsed(ctx.user.id, added);
+
+        return { added, found: candidates.length, query };
       }),
 
     add: protectedProcedure

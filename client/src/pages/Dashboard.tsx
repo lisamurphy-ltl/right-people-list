@@ -204,7 +204,7 @@ export default function Dashboard() {
           <div className="text-center py-20 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
             <Users size={40} style={{ color: "oklch(0.35 0.012 260)", margin: "0 auto 1rem" }} />
             <p style={{ color: "oklch(0.55 0.008 260)", fontFamily: "Archivo, sans-serif", fontWeight: 600 }}>No leads yet</p>
-            <p className="text-sm mt-1" style={{ color: "oklch(0.40 0.008 260)" }}>Use the query builder above, then add leads here.</p>
+            <p className="text-sm mt-1" style={{ color: "oklch(0.40 0.008 260)" }}>Click "Find My Leads" above and we'll fill this in automatically.</p>
             <PaywallGate sub={sub} isAuthenticated={isAuthenticated} onAllowed={() => setShowAddModal(true)}>
               <button className="mt-4 px-5 py-2 rounded text-sm font-bold"
                 style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
