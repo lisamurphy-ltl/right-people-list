@@ -116,19 +116,19 @@ export default function Pricing() {
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
         style={{ background: "oklch(0.13 0.012 260 / 0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid oklch(0.22 0.012 260)" }}>
-        <a href="/" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.1rem", color: "oklch(0.92 0.005 260)", textDecoration: "none", letterSpacing: "-0.02em" }}>
+        <a href="/" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.1rem", color: "oklch(0.92 0.005 260)", textDecoration: "none", letterSpacing: "-0.02em" }}>
           The <span className="text-chrome-gold">Right-People List</span>
         </a>
         <a href={isAuthenticated ? "/dashboard" : getLoginUrl()}
-          style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif", fontWeight: 700, padding: "0.5rem 1.25rem", borderRadius: "0.375rem", textDecoration: "none", fontSize: "0.875rem" }}>
+          style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", fontWeight: 700, padding: "0.5rem 1.25rem", borderRadius: "0.375rem", textDecoration: "none", fontSize: "0.875rem" }}>
           {isAuthenticated ? "Dashboard" : "Sign In"}
         </a>
       </nav>
 
       <div className="pt-28 pb-20 container">
         <div className="text-center mb-14">
-          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Syne, sans-serif" }}>Pricing</p>
-          <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", fontFamily: "Syne, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>Pricing</p>
+          <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
             Find your people.<br /><span style={{ color: "oklch(0.78 0.18 85)" }}>Close more deals.</span>
           </h1>
           <p className="mt-4 text-base max-w-lg mx-auto" style={{ color: "oklch(0.60 0.008 260)" }}>
@@ -145,15 +145,15 @@ export default function Pricing() {
               }}>
               {tier.highlight && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold"
-                  style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif" }}>
+                  style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
                   Most Popular
                 </div>
               )}
 
               <div className="mb-5">
-                <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Syne, sans-serif" }}>{tier.name}</p>
+                <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{tier.name}</p>
                 <div className="flex items-baseline gap-1">
-                  <span style={{ fontSize: "2.2rem", fontFamily: "Syne, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>{tier.price}</span>
+                  <span style={{ fontSize: "2.2rem", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>{tier.price}</span>
                   <span className="text-sm" style={{ color: "oklch(0.50 0.008 260)" }}>{tier.period}</span>
                 </div>
                 <p className="mt-2 text-xs font-semibold" style={{ color: tier.highlight ? "oklch(0.78 0.18 85)" : "oklch(0.60 0.20 255)" }}>{tier.leads}</p>
@@ -167,9 +167,9 @@ export default function Pricing() {
                   </div>
                 ))}
                 {tier.locked.map(f => (
-                  <div key={f} className="flex items-start gap-2 text-sm opacity-35">
-                    <span style={{ color: "oklch(0.40 0.008 260)", marginTop: "2px", flexShrink: 0, fontSize: "0.85rem" }}>✕</span>
-                    <span style={{ color: "oklch(0.40 0.008 260)" }}>{f}</span>
+                  <div key={f} className="flex items-start gap-2 text-sm">
+                    <span style={{ color: "oklch(0.48 0.010 260)", marginTop: "2px", flexShrink: 0, fontSize: "0.85rem" }}>✕</span>
+                    <span style={{ color: "oklch(0.52 0.008 260)" }}>{f}</span>
                   </div>
                 ))}
               </div>
@@ -182,7 +182,7 @@ export default function Pricing() {
                   background: tier.highlight ? "oklch(0.78 0.18 85)" : "oklch(0.24 0.014 260)",
                   color: tier.highlight ? "oklch(0.13 0.012 260)" : "oklch(0.80 0.008 260)",
                   border: tier.highlight ? "none" : "1px solid oklch(0.32 0.012 260)",
-                  fontFamily: "Syne, sans-serif",
+                  fontFamily: "Archivo, sans-serif",
                 }}
               >
                 {tier.cta}
@@ -198,10 +198,10 @@ export default function Pricing() {
             <div className="absolute top-0 right-0 w-64 h-32 blur-3xl rounded-full pointer-events-none" style={{ background: "oklch(0.78 0.18 85 / 0.07)" }} />
             <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-6">
               <div className="flex-1">
-                <div className="inline-flex items-center gap-1.5 mb-2 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest" style={{ background: "oklch(0.78 0.18 85 / 0.12)", border: "1px solid oklch(0.78 0.18 85 / 0.35)", color: "oklch(0.78 0.18 85)", fontFamily: "Syne, sans-serif" }}>
+                <div className="inline-flex items-center gap-1.5 mb-2 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest" style={{ background: "oklch(0.78 0.18 85 / 0.12)", border: "1px solid oklch(0.78 0.18 85 / 0.35)", color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>
                   One-Time Add-On
                 </div>
-                <h3 className="mb-1 text-xl" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", letterSpacing: "-0.02em" }}>
+                <h3 className="mb-1 text-xl" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", letterSpacing: "-0.02em" }}>
                   Plug-and-Play Outreach System
                 </h3>
                 <p className="text-sm leading-relaxed mb-3" style={{ color: "oklch(0.62 0.008 260)" }}>
@@ -216,7 +216,7 @@ export default function Pricing() {
               </div>
               <div className="flex flex-col items-center gap-2 shrink-0">
                 <div className="text-center mb-1">
-                  <span style={{ fontSize: "2rem", fontFamily: "Syne, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>$49</span>
+                  <span style={{ fontSize: "2rem", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>$49</span>
                   <p className="text-xs mt-0.5" style={{ color: "oklch(0.50 0.008 260)" }}>one-time</p>
                 </div>
                 <button
@@ -226,7 +226,7 @@ export default function Pricing() {
                   }}
                   disabled={promptPackMutation.isPending}
                   className="px-6 py-2.5 rounded font-bold text-sm whitespace-nowrap transition-all"
-                  style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif" }}
+                  style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}
                 >
                   {promptPackMutation.isPending ? "Loading..." : "Get the Prompts →"}
                 </button>
@@ -238,7 +238,7 @@ export default function Pricing() {
 
         {/* Legal compliance note */}
         <div className="mt-12 p-5 rounded-lg max-w-2xl mx-auto" style={{ background: "oklch(0.60 0.20 255 / 0.06)", border: "1px solid oklch(0.60 0.20 255 / 0.20)" }}>
-          <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.60 0.20 255)", fontFamily: "Syne, sans-serif" }}>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.60 0.20 255)", fontFamily: "Archivo, sans-serif" }}>
             <Zap size={11} style={{ display: "inline", marginRight: "4px" }} />Legal & Ethical Use
           </p>
           <p className="text-sm leading-relaxed break-words" style={{ color: "oklch(0.58 0.008 260)" }}>

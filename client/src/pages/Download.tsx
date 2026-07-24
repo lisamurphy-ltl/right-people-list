@@ -41,13 +41,13 @@ export default function DownloadPage() {
         {error && (
           <div className="p-8 rounded-xl text-center" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.35 0.012 260)" }}>
             <AlertCircle className="mx-auto mb-4" size={40} style={{ color: "#cc3333" }} />
-            <h2 className="mb-2 text-xl" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, color: "oklch(0.95 0.005 260)" }}>
+            <h2 className="mb-2 text-xl" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.95 0.005 260)" }}>
               Payment Not Verified
             </h2>
             <p className="mb-6 text-sm" style={{ color: "oklch(0.60 0.008 260)" }}>
               We couldn't verify your payment. If you completed checkout, please contact support with your order confirmation.
             </p>
-            <a href="/pricing" style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
+            <a href="/pricing" style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
               ← Back to Pricing
             </a>
           </div>
@@ -64,10 +64,10 @@ export default function DownloadPage() {
                 <CheckCircle size={32} style={{ color: "oklch(0.78 0.18 85)" }} />
               </div>
 
-              <div className="mb-1 text-xs font-semibold uppercase tracking-widest" style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Syne, sans-serif" }}>
+              <div className="mb-1 text-xs font-semibold uppercase tracking-widest" style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>
                 Payment Confirmed
               </div>
-              <h2 className="mb-3 text-2xl" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", letterSpacing: "-0.02em" }}>
+              <h2 className="mb-3 text-2xl" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", letterSpacing: "-0.02em" }}>
                 Your Outreach System<br />is Ready
               </h2>
               <p className="mb-6 text-sm" style={{ color: "oklch(0.60 0.008 260)", lineHeight: 1.6 }}>
@@ -81,7 +81,7 @@ export default function DownloadPage() {
                 style={{
                   background: "oklch(0.78 0.18 85)",
                   color: "oklch(0.13 0.012 260)",
-                  fontFamily: "Syne, sans-serif",
+                  fontFamily: "Archivo, sans-serif",
                   fontSize: "1rem",
                   transform: downloading ? "scale(0.97)" : "scale(1)",
                 }}
@@ -97,7 +97,7 @@ export default function DownloadPage() {
                 <a
                   href="/dashboard"
                   className="inline-flex items-center gap-1.5 text-sm font-semibold"
-                  style={{ color: "oklch(0.60 0.20 255)", fontFamily: "Syne, sans-serif" }}
+                  style={{ color: "oklch(0.60 0.20 255)", fontFamily: "Archivo, sans-serif" }}
                 >
                   Go to your Lead Dashboard <ArrowRight size={14} />
                 </a>

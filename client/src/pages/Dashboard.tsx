@@ -9,6 +9,7 @@ import {
 import { toast } from "sonner";
 import AddLeadModal from "@/components/AddLeadModal";
 import PaywallGate from "@/components/PaywallGate";
+import QueryBuilder from "@/components/QueryBuilder";
 
 const SCORE_COLOR: Record<string, string> = {
   high:   "oklch(0.65 0.18 145)",
@@ -91,10 +92,10 @@ export default function Dashboard() {
 
   if (!isAuthenticated) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-6" style={{ background: "oklch(0.13 0.012 260)" }}>
-      <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.8rem", color: "oklch(0.95 0.005 260)" }}>
+      <h2 style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.8rem", color: "oklch(0.95 0.005 260)" }}>
         Sign in to access your dashboard
       </h2>
-      <a href={getLoginUrl()} style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif", fontWeight: 700, padding: "0.875rem 2rem", borderRadius: "0.375rem", textDecoration: "none" }}>
+      <a href={getLoginUrl()} style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", fontWeight: 700, padding: "0.875rem 2rem", borderRadius: "0.375rem", textDecoration: "none" }}>
         Sign In
       </a>
     </div>
@@ -113,11 +114,11 @@ export default function Dashboard() {
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
         style={{ background: "oklch(0.13 0.012 260 / 0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid oklch(0.22 0.012 260)" }}>
-        <a href="/" style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.1rem", color: "oklch(0.92 0.005 260)", textDecoration: "none", letterSpacing: "-0.02em" }}>
+        <a href="/" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.1rem", color: "oklch(0.92 0.005 260)", textDecoration: "none", letterSpacing: "-0.02em" }}>
           The <span className="text-chrome-gold">Right-People List</span>
         </a>
         <div className="flex items-center gap-3">
-          <span className="text-sm px-3 py-1 rounded-full" style={{ background: "oklch(0.20 0.012 260)", color: PLAN_COLOR[plan], border: `1px solid ${PLAN_COLOR[plan]}40`, fontFamily: "Syne, sans-serif", fontWeight: 700 }}>
+          <span className="text-sm px-3 py-1 rounded-full" style={{ background: "oklch(0.20 0.012 260)", color: PLAN_COLOR[plan], border: `1px solid ${PLAN_COLOR[plan]}40`, fontFamily: "Archivo, sans-serif", fontWeight: 700 }}>
             {PLAN_LABEL[plan]}
           </span>
           <span className="text-sm" style={{ color: "oklch(0.60 0.008 260)" }}>{user?.name}</span>
@@ -125,6 +126,8 @@ export default function Dashboard() {
       </nav>
 
       <div className="pt-20 container py-8">
+        <QueryBuilder />
+
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
@@ -134,8 +137,8 @@ export default function Dashboard() {
             { icon: <Zap size={18} />, label: "Plan", value: PLAN_LABEL[plan], color: PLAN_COLOR[plan] },
           ].map(s => (
             <div key={s.label} className="p-4 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
-              <div className="flex items-center gap-2 mb-2" style={{ color: s.color }}>{s.icon}<span className="text-xs uppercase tracking-widest font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>{s.label}</span></div>
-              <div className="text-2xl font-black" style={{ fontFamily: "Syne, sans-serif", color: "oklch(0.95 0.005 260)" }}>{s.value}</div>
+              <div className="flex items-center gap-2 mb-2" style={{ color: s.color }}>{s.icon}<span className="text-xs uppercase tracking-widest font-semibold" style={{ fontFamily: "Archivo, sans-serif" }}>{s.label}</span></div>
+              <div className="text-2xl font-black" style={{ fontFamily: "Archivo, sans-serif", color: "oklch(0.95 0.005 260)" }}>{s.value}</div>
             </div>
           ))}
         </div>
@@ -144,7 +147,7 @@ export default function Dashboard() {
         {leadsLimit !== 99999 && (
           <div className="mb-6 p-4 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Syne, sans-serif" }}>Monthly Usage</span>
+              <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>Monthly Usage</span>
               <span className="text-xs" style={{ color: "oklch(0.60 0.008 260)" }}>{leadsUsed} / {leadsLimit} leads</span>
             </div>
             <div className="h-2 rounded-full overflow-hidden" style={{ background: "oklch(0.22 0.012 260)" }}>
@@ -161,7 +164,7 @@ export default function Dashboard() {
 
         {/* Action Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-          <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.5rem", color: "oklch(0.95 0.005 260)" }}>Your Leads</h1>
+          <h1 style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.5rem", color: "oklch(0.95 0.005 260)" }}>Your Leads</h1>
           <div className="flex gap-3">
             {plan !== "agency" && (
               <button
@@ -170,7 +173,7 @@ export default function Dashboard() {
                   checkoutMutation.mutate({ plan: next as "pro" | "pro_plus" | "agency" });
                 }}
                 className="flex items-center gap-2 px-4 py-2 rounded text-sm font-bold transition-all"
-                style={{ background: "oklch(0.78 0.18 85 / 0.15)", color: "oklch(0.78 0.18 85)", border: "1px solid oklch(0.78 0.18 85 / 0.4)", fontFamily: "Syne, sans-serif" }}
+                style={{ background: "oklch(0.78 0.18 85 / 0.15)", color: "oklch(0.78 0.18 85)", border: "1px solid oklch(0.78 0.18 85 / 0.4)", fontFamily: "Archivo, sans-serif" }}
               >
                 <Zap size={14} /> Upgrade Plan
               </button>
@@ -187,7 +190,7 @@ export default function Dashboard() {
             </button>
             <PaywallGate sub={sub} isAuthenticated={isAuthenticated} onAllowed={() => setShowAddModal(true)}>
               <button className="flex items-center gap-2 px-4 py-2 rounded text-sm font-bold transition-all"
-                style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif" }}>
+                style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
                 <Plus size={14} /> Add Lead
               </button>
             </PaywallGate>
@@ -200,11 +203,11 @@ export default function Dashboard() {
         ) : !leadsData?.items?.length ? (
           <div className="text-center py-20 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
             <Users size={40} style={{ color: "oklch(0.35 0.012 260)", margin: "0 auto 1rem" }} />
-            <p style={{ color: "oklch(0.55 0.008 260)", fontFamily: "Syne, sans-serif", fontWeight: 600 }}>No leads yet</p>
-            <p className="text-sm mt-1" style={{ color: "oklch(0.40 0.008 260)" }}>Use the query builder on the home page, then add leads here.</p>
+            <p style={{ color: "oklch(0.55 0.008 260)", fontFamily: "Archivo, sans-serif", fontWeight: 600 }}>No leads yet</p>
+            <p className="text-sm mt-1" style={{ color: "oklch(0.40 0.008 260)" }}>Use the query builder above, then add leads here.</p>
             <PaywallGate sub={sub} isAuthenticated={isAuthenticated} onAllowed={() => setShowAddModal(true)}>
               <button className="mt-4 px-5 py-2 rounded text-sm font-bold"
-                style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif" }}>
+                style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
                 Add Your First Lead
               </button>
             </PaywallGate>
@@ -217,7 +220,7 @@ export default function Dashboard() {
                   <tr style={{ background: "oklch(0.18 0.012 260)", borderBottom: "1px solid oklch(0.26 0.012 260)" }}>
                     {["Name & Title","Company","Contact","Score","Status","Actions"].map(h => (
                       <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest"
-                        style={{ color: "oklch(0.50 0.010 260)", fontFamily: "Syne, sans-serif" }}>{h}</th>
+                        style={{ color: "oklch(0.50 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -308,14 +311,14 @@ export default function Dashboard() {
           <div className="mt-6 p-5 rounded-lg" style={{ background: "oklch(0.78 0.18 85 / 0.06)", border: "1px solid oklch(0.78 0.18 85 / 0.25)" }}>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <p className="font-bold" style={{ fontFamily: "Syne, sans-serif", color: "oklch(0.92 0.005 260)" }}>Want emails and phone numbers?</p>
+                <p className="font-bold" style={{ fontFamily: "Archivo, sans-serif", color: "oklch(0.92 0.005 260)" }}>Want emails and phone numbers?</p>
                 <p className="text-sm mt-1" style={{ color: "oklch(0.60 0.008 260)" }}>
                   Scout Pro adds unverified emails. Scout Pro+ adds verified emails + phone via Apollo. Agency is unlimited.
                 </p>
               </div>
               <button onClick={() => checkoutMutation.mutate({ plan: "pro" })}
                 className="px-5 py-2.5 rounded font-bold text-sm whitespace-nowrap"
-                style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif" }}>
+                style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
                 Upgrade to Pro — $47/mo
               </button>
             </div>

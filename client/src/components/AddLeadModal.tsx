@@ -24,7 +24,7 @@ export default function AddLeadModal({ onClose, onAdded }: Props) {
   const field = (key: keyof typeof form, label: string, placeholder = "") => (
     <div>
       <label className="block text-xs font-semibold uppercase tracking-widest mb-1"
-        style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Syne, sans-serif" }}>{label}</label>
+        style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{label}</label>
       <input
         value={form[key] as string}
         onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
@@ -39,7 +39,7 @@ export default function AddLeadModal({ onClose, onAdded }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "oklch(0 0 0 / 0.7)" }}>
       <div className="w-full max-w-lg rounded-xl p-6" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.28 0.012 260)" }}>
         <div className="flex items-center justify-between mb-5">
-          <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, color: "oklch(0.95 0.005 260)" }}>Add Lead</h2>
+          <h2 style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.95 0.005 260)" }}>Add Lead</h2>
           <button onClick={onClose} style={{ color: "oklch(0.50 0.008 260)" }}><X size={18} /></button>
         </div>
 
@@ -54,7 +54,7 @@ export default function AddLeadModal({ onClose, onAdded }: Props) {
 
         <div className="mt-3">
           <label className="block text-xs font-semibold uppercase tracking-widest mb-1"
-            style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Syne, sans-serif" }}>Relevance Score</label>
+            style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Archivo, sans-serif" }}>Relevance Score</label>
           <div className="flex gap-2">
             {(["high", "medium", "low"] as const).map(s => (
               <button key={s} onClick={() => setForm(f => ({ ...f, relevanceScore: s }))}
@@ -77,7 +77,7 @@ export default function AddLeadModal({ onClose, onAdded }: Props) {
             onClick={() => addMutation.mutate(form)}
             disabled={addMutation.isPending || !form.fullName}
             className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded text-sm font-bold"
-            style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif", opacity: addMutation.isPending || !form.fullName ? 0.6 : 1 }}
+            style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", opacity: addMutation.isPending || !form.fullName ? 0.6 : 1 }}
           >
             {addMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : null}
             Add Lead

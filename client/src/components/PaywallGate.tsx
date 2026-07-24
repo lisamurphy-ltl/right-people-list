@@ -100,7 +100,7 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
               style={{ borderBottom: "1px solid oklch(0.24 0.012 260)" }}>
               <div className="flex items-center gap-2">
                 <Lock size={16} style={{ color: "oklch(0.78 0.18 85)" }} />
-                <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, color: "oklch(0.92 0.005 260)" }}>
+                <span style={{ fontFamily: "Archivo, sans-serif", fontWeight: 700, color: "oklch(0.92 0.005 260)" }}>
                   {!isAuthenticated ? "Sign in to continue" : "Monthly limit reached"}
                 </span>
               </div>
@@ -118,7 +118,7 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
                   <div className="p-4 rounded-lg mb-5"
                     style={{ background: "oklch(0.78 0.18 85 / 0.08)", border: "1px solid oklch(0.78 0.18 85 / 0.25)" }}>
                     <p className="text-xs font-semibold uppercase tracking-widest mb-1"
-                      style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Syne, sans-serif" }}>Free plan includes</p>
+                      style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>Free plan includes</p>
                     <ul className="text-xs space-y-1" style={{ color: "oklch(0.68 0.008 260)" }}>
                       <li>✓ 25 leads per month</li>
                       <li>✓ ICP query builder</li>
@@ -129,7 +129,7 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
                   </div>
                   <a href={getLoginUrl()}
                     className="flex items-center justify-center gap-2 w-full py-3 rounded font-bold text-sm"
-                    style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif", textDecoration: "none" }}>
+                    style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", textDecoration: "none" }}>
                     <LogIn size={15} /> Sign In — It's Free
                   </a>
                 </>
@@ -145,7 +145,7 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
                   <div className="p-4 rounded-lg mb-4"
                     style={{ background: "oklch(0.78 0.18 85 / 0.08)", border: "1px solid oklch(0.78 0.18 85 / 0.25)" }}>
                     <p className="text-xs font-semibold uppercase tracking-widest mb-1"
-                      style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Syne, sans-serif" }}>
+                      style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>
                       Upgrade to {nextPlanLabel()}
                     </p>
                     <p className="text-xs" style={{ color: "oklch(0.60 0.008 260)" }}>
@@ -159,7 +159,7 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
                     onClick={() => checkoutMutation.mutate({ plan: nextPlan() as "pro" | "pro_plus" | "agency" })}
                     disabled={checkoutMutation.isPending}
                     className="flex items-center justify-center gap-2 w-full py-3 rounded font-bold text-sm mb-3"
-                    style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif" }}>
+                    style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
                     <Zap size={15} /> Upgrade to {nextPlanLabel()} — {nextPlanPrice()}
                   </button>
 

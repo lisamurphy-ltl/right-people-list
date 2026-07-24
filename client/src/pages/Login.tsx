@@ -57,10 +57,10 @@ export default function Login() {
     >
       <div className="w-full max-w-md p-8 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
         <div className="mb-8 text-center">
-          <span style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.3rem", color: "oklch(0.92 0.005 260)", letterSpacing: "-0.02em" }}>
+          <span style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.3rem", color: "oklch(0.92 0.005 260)", letterSpacing: "-0.02em" }}>
             The <span className="text-chrome-gold">Right-People List</span>
           </span>
-          <h1 className="mt-4" style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "1.5rem", color: "oklch(0.95 0.005 260)" }}>
+          <h1 className="mt-4" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 700, fontSize: "1.5rem", color: "oklch(0.95 0.005 260)" }}>
             {mode === "login" ? "Welcome back" : "Create your account"}
           </h1>
         </div>
@@ -68,7 +68,7 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {mode === "signup" && (
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Syne, sans-serif" }}>
+              <label className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
                 Name
               </label>
               <input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
@@ -76,14 +76,14 @@ export default function Login() {
           )}
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Syne, sans-serif" }}>
+            <label className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
               Email
             </label>
             <input style={inputStyle} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Syne, sans-serif" }}>
+            <label className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
               Password
             </label>
             <input style={inputStyle} type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
@@ -97,7 +97,7 @@ export default function Login() {
             type="submit"
             disabled={pending}
             className="w-full py-3 rounded font-bold text-sm mt-2"
-            style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif", opacity: pending ? 0.7 : 1 }}
+            style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", opacity: pending ? 0.7 : 1 }}
           >
             {pending ? "Please wait…" : mode === "login" ? "Log In" : "Sign Up"}
           </button>

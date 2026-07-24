@@ -71,7 +71,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
           style={{ borderBottom: "1px solid oklch(0.24 0.012 260)", background: "oklch(0.15 0.012 260)" }}>
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest"
-              style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Syne, sans-serif" }}>
+              style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>
               ICP Clarity Guide — Free
             </p>
             <p className="text-xs mt-0.5" style={{ color: "oklch(0.45 0.008 260)" }}>
@@ -99,7 +99,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
                   {current.icon}
                 </div>
                 <div>
-                  <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.2rem", color: "oklch(0.95 0.005 260)" }}>
+                  <h2 style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.2rem", color: "oklch(0.95 0.005 260)" }}>
                     {current.title}
                   </h2>
                   <p className="text-sm" style={{ color: "oklch(0.55 0.008 260)" }}>{current.subtitle}</p>
@@ -141,7 +141,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
                   <Target size={28} />
                 </div>
                 <div>
-                  <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.2rem", color: "oklch(0.95 0.005 260)" }}>
+                  <h2 style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.2rem", color: "oklch(0.95 0.005 260)" }}>
                     Your ICP snapshot
                   </h2>
                   <p className="text-sm" style={{ color: "oklch(0.55 0.008 260)" }}>Here's what you've built. Now go find them.</p>
@@ -157,7 +157,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
                   <div key={item.label} className="p-3 rounded-lg"
                     style={{ background: "oklch(0.21 0.012 260)", border: "1px solid oklch(0.28 0.012 260)" }}>
                     <p className="text-xs font-semibold uppercase tracking-widest mb-1"
-                      style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Syne, sans-serif" }}>{item.label}</p>
+                      style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>{item.label}</p>
                     <p className="text-sm leading-relaxed" style={{ color: "oklch(0.75 0.008 260)" }}>
                       {item.value || <span style={{ color: "oklch(0.40 0.008 260)", fontStyle: "italic" }}>Not filled in</span>}
                     </p>
@@ -167,7 +167,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
 
               <div className="p-4 rounded-lg mb-4"
                 style={{ background: "oklch(0.78 0.18 85 / 0.08)", border: "1px solid oklch(0.78 0.18 85 / 0.25)" }}>
-                <p className="text-sm font-semibold mb-1" style={{ color: "oklch(0.90 0.005 260)", fontFamily: "Syne, sans-serif" }}>
+                <p className="text-sm font-semibold mb-1" style={{ color: "oklch(0.90 0.005 260)", fontFamily: "Archivo, sans-serif" }}>
                   Next step: Use the query builder below
                 </p>
                 <p className="text-xs leading-relaxed" style={{ color: "oklch(0.60 0.008 260)" }}>
@@ -178,7 +178,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
               <div className="p-4 rounded-lg"
                 style={{ background: "oklch(0.60 0.20 255 / 0.06)", border: "1px solid oklch(0.60 0.20 255 / 0.20)" }}>
                 <p className="text-xs font-semibold uppercase tracking-widest mb-1"
-                  style={{ color: "oklch(0.60 0.20 255)", fontFamily: "Syne, sans-serif" }}>Still fuzzy on your ICP?</p>
+                  style={{ color: "oklch(0.60 0.20 255)", fontFamily: "Archivo, sans-serif" }}>Still fuzzy on your ICP?</p>
                 <p className="text-xs leading-relaxed" style={{ color: "oklch(0.55 0.008 260)" }}>
                   The Client Engine Builder walks you through a full ICP architecture session — positioning, messaging, and offer alignment. It's the deeper work that makes this tool 10x more powerful.
                 </p>
@@ -209,7 +209,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
               style={{
                 background: canNext ? "oklch(0.78 0.18 85)" : "oklch(0.30 0.012 260)",
                 color: canNext ? "oklch(0.13 0.012 260)" : "oklch(0.45 0.008 260)",
-                fontFamily: "Syne, sans-serif",
+                fontFamily: "Archivo, sans-serif",
                 cursor: canNext ? "pointer" : "not-allowed",
               }}>
               Next <ChevronRight size={14} />
@@ -218,7 +218,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
             <button
               onClick={onClose}
               className="flex items-center gap-2 px-5 py-2 rounded text-sm font-bold"
-              style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Syne, sans-serif" }}>
+              style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
               Build My Query <ArrowRight size={14} />
             </button>
           )}
