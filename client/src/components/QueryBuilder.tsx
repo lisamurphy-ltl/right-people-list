@@ -7,13 +7,15 @@ const ROLES = ["Founder", "Owner", "CEO", "President", "Managing Director", "Pri
 const INDUSTRIES = ["Coaching", "Consulting", "Marketing Agency", "PR Agency", "Staffing", "Financial Advisory", "Legal Services", "Accounting", "IT Services", "Real Estate"];
 const PAIN_KEYWORDS = ["scale", "scaling", "burnout", "growth", "overworked", "systems", "hiring", "stuck", "overwhelmed", "team", "delegation", "revenue"];
 const LOCATIONS = ["United States", "Canada", "United Kingdom", "Australia", "Remote"];
+const COMPANY_SIZES = ["Solopreneur", "Boutique agency", "Small team", "Growing team", "Established firm"];
 
-function buildQuery(roles: string[], industries: string[], pains: string[], location: string): string {
+function buildQuery(roles: string[], industries: string[], pains: string[], location: string, companySize: string): string {
   const roleStr = roles.length > 0 ? `(${roles.map(r => `"${r}"`).join(" OR ")})` : `("Founder" OR "Owner" OR "CEO")`;
   const indStr = industries.length > 0 ? `(${industries.map(i => `"${i}"`).join(" OR ")})` : `("Consulting" OR "Coaching" OR "Agency")`;
   const painStr = pains.length > 0 ? `(${pains.slice(0, 5).map(p => `"${p}"`).join(" OR ")})` : `("scale" OR "burnout" OR "growth")`;
   const locStr = location ? `"${location}"` : `"United States"`;
-  return `site:linkedin.com/in/ ${roleStr} ${indStr} ${painStr} ${locStr}`;
+  const sizeStr = companySize ? ` "${companySize.toLowerCase()}"` : "";
+  return `site:linkedin.com/in/ ${roleStr} ${indStr} ${painStr} ${locStr}${sizeStr}`;
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -76,12 +78,13 @@ export default function QueryBuilder() {
   const [industries, setIndustries] = useState<string[]>(["Coaching", "Consulting"]);
   const [pains, setPains] = useState<string[]>(["scale", "burnout", "growth"]);
   const [location, setLocation] = useState("United States");
+  const [companySize, setCompanySize] = useState("");
 
   const toggle = (arr: string[], val: string, set: (a: string[]) => void) => {
     set(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
   };
 
-  const query = buildQuery(roles, industries, pains, location);
+  const query = buildQuery(roles, industries, pains, location, companySize);
   const utils = trpc.useUtils();
 
   const searchMutation = trpc.leads.runSearch.useMutation({
@@ -130,6 +133,30 @@ export default function QueryBuilder() {
               ))}
             </div>
           </div>
+          <div className="mt-5">
+            <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+              Company Size <span style={{ textTransform: "none", fontWeight: 400, color: "oklch(0.45 0.008 260)" }}>(optional — narrows results further)</span>
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {COMPANY_SIZES.map((size) => {
+                const active = companySize === size;
+                return (
+                  <button
+                    key={size}
+                    onClick={() => setCompanySize(active ? "" : size)}
+                    className="px-3 py-1 rounded-full text-sm font-medium transition-all duration-150"
+                    style={{
+                      background: active ? "oklch(0.65 0.18 145 / 0.18)" : "oklch(0.22 0.014 260)",
+                      color: active ? "oklch(0.65 0.18 145)" : "oklch(0.68 0.008 260)",
+                      border: `1px solid ${active ? "oklch(0.65 0.18 145 / 0.6)" : "oklch(0.30 0.012 260)"}`,
+                    }}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         <div className="lg:col-span-2">
@@ -141,7 +168,7 @@ export default function QueryBuilder() {
           </div>
           <div className="query-block mb-5 min-h-[100px]">{query}</div>
           <button
-            onClick={() => searchMutation.mutate({ roles, industries, pains, location })}
+            onClick={() => searchMutation.mutate({ roles, industries, pains, location, companySize })}
             disabled={searchMutation.isPending}
             className="flex items-center justify-center gap-2 w-full py-3 rounded font-bold text-sm transition-all duration-160"
             style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", opacity: searchMutation.isPending ? 0.7 : 1 }}

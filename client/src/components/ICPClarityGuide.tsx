@@ -171,7 +171,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
                   Next step: Use the query builder below
                 </p>
                 <p className="text-xs leading-relaxed" style={{ color: "oklch(0.60 0.008 260)" }}>
-                  Take what you just wrote and translate it into the role, industry, and pain keyword tags in the The Right-People List query builder. Your "where they hang out" answer tells you which keywords to prioritize.
+                  Take what you just wrote and translate it into the role, industry, pain keyword, and company size tags in The Right-People List query builder. Your "where they hang out" answer tells you which keywords to prioritize.
                 </p>
               </div>
 

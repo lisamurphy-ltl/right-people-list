@@ -24,12 +24,13 @@ import {
 import { apolloEnrich, guessEmail } from "./enrichment";
 import { searchLinkedInProfiles } from "./leadSearch";
 
-function buildIcpQuery(roles: string[], industries: string[], pains: string[], location: string): string {
+function buildIcpQuery(roles: string[], industries: string[], pains: string[], location: string, companySize?: string): string {
   const roleStr = roles.length > 0 ? `(${roles.map(r => `"${r}"`).join(" OR ")})` : `("Founder" OR "Owner" OR "CEO")`;
   const indStr = industries.length > 0 ? `(${industries.map(i => `"${i}"`).join(" OR ")})` : `("Consulting" OR "Coaching" OR "Agency")`;
   const painStr = pains.length > 0 ? `(${pains.slice(0, 5).map(p => `"${p}"`).join(" OR ")})` : `("scale" OR "burnout" OR "growth")`;
   const locStr = location ? `"${location}"` : `"United States"`;
-  return `site:linkedin.com/in/ ${roleStr} ${indStr} ${painStr} ${locStr}`;
+  const sizeStr = companySize ? ` "${companySize.toLowerCase()}"` : "";
+  return `site:linkedin.com/in/ ${roleStr} ${indStr} ${painStr} ${locStr}${sizeStr}`;
 }
 
 const EMAIL_SCHEMA = z.string().trim().toLowerCase().email();
@@ -249,6 +250,7 @@ export const appRouter = router({
         industries: z.array(z.string()),
         pains: z.array(z.string()),
         location: z.string(),
+        companySize: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const sub = await getOrCreateSubscription(ctx.user.id);
@@ -261,7 +263,7 @@ export const appRouter = router({
           throw new Error(`Monthly lead limit reached (${limits.leadsPerMonth}). Upgrade to run more searches.`);
         }
 
-        const query = buildIcpQuery(input.roles, input.industries, input.pains, input.location);
+        const query = buildIcpQuery(input.roles, input.industries, input.pains, input.location, input.companySize);
         const candidates = await searchLinkedInProfiles(query, Math.min(remaining, 10));
 
         const existing = await getLeadsByUser(ctx.user.id, 1000, 0);
