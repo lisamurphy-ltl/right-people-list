@@ -8,6 +8,7 @@ import { sdk } from "./_core/sdk";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import {
+  addBonusLeadsOnce,
   createLead,
   createUser,
   getLeadById,
@@ -66,6 +67,8 @@ const PRICE_IDS = {
   pro_plus: process.env.STRIPE_PRICE_PRO_PLUS ?? "",
   agency:   process.env.STRIPE_PRICE_AGENCY   ?? "",
 };
+const TOP_UP_PRICE_ID = process.env.STRIPE_PRICE_TOPUP ?? "";
+const TOP_UP_LEADS = 100;
 
 export const appRouter = router({
   system: systemRouter,
@@ -126,7 +129,7 @@ export const appRouter = router({
         limits,
         leadsRemaining: limits.leadsPerMonth === 99999
           ? 99999
-          : Math.max(0, limits.leadsPerMonth - sub.leadsUsed),
+          : Math.max(0, limits.leadsPerMonth + sub.bonusLeads - sub.leadsUsed),
       };
     }),
 
@@ -172,6 +175,52 @@ export const appRouter = router({
       });
       return { url: session.url };
     }),
+
+    createTopUpCheckout: protectedProcedure.mutation(async ({ ctx }) => {
+      if (!TOP_UP_PRICE_ID) throw new Error("Lead top-up is not configured yet.");
+
+      const sub = await getOrCreateSubscription(ctx.user.id);
+      let customerId = sub.stripeCustomerId ?? undefined;
+
+      if (!customerId) {
+        const customer = await getStripe().customers.create({
+          email: ctx.user.email ?? undefined,
+          name: ctx.user.name ?? undefined,
+          metadata: { userId: String(ctx.user.id) },
+        });
+        customerId = customer.id;
+        await updateSubscription(ctx.user.id, { stripeCustomerId: customerId });
+      }
+
+      const session = await getStripe().checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ["card"],
+        line_items: [{ price: TOP_UP_PRICE_ID, quantity: 1 }],
+        mode: "payment",
+        allow_promotion_codes: true,
+        success_url: `${process.env.VITE_APP_URL ?? "https://localhost:3000"}/dashboard?topup_session={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.VITE_APP_URL ?? "https://localhost:3000"}/pricing`,
+        metadata: { userId: String(ctx.user.id), product: "lead_topup" },
+      });
+
+      return { url: session.url };
+    }),
+
+    verifyTopUp: protectedProcedure
+      .input(z.object({ sessionId: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const session = await getStripe().checkout.sessions.retrieve(input.sessionId);
+        const paid = session.payment_status === "paid";
+        const isOwner = session.metadata?.userId === String(ctx.user.id);
+        const isTopUp = session.metadata?.product === "lead_topup";
+
+        if (!paid || !isOwner || !isTopUp) {
+          throw new Error("Payment not verified or session does not belong to this user.");
+        }
+
+        const credited = await addBonusLeadsOnce(ctx.user.id, TOP_UP_LEADS, input.sessionId);
+        return { added: credited ? TOP_UP_LEADS : 0, alreadyCredited: !credited };
+      }),
   }),
 
   // ── Prompt Pack (one-time $49 purchase) ──────────────────────────────────
@@ -257,10 +306,10 @@ export const appRouter = router({
         const limits = PLAN_LIMITS[sub.plan];
         const remaining = limits.leadsPerMonth === 99999
           ? 25
-          : Math.max(0, limits.leadsPerMonth - sub.leadsUsed);
+          : Math.max(0, limits.leadsPerMonth + sub.bonusLeads - sub.leadsUsed);
 
         if (remaining <= 0) {
-          throw new Error(`Monthly lead limit reached (${limits.leadsPerMonth}). Upgrade to run more searches.`);
+          throw new Error(`Monthly lead limit reached (${limits.leadsPerMonth}). Upgrade or buy a lead top-up to run more searches.`);
         }
 
         const query = buildIcpQuery(input.roles, input.industries, input.pains, input.location, input.companySize);
@@ -307,8 +356,8 @@ export const appRouter = router({
         const sub = await getOrCreateSubscription(ctx.user.id);
         const limits = PLAN_LIMITS[sub.plan];
 
-        if (limits.leadsPerMonth !== 99999 && sub.leadsUsed >= limits.leadsPerMonth) {
-          throw new Error(`Monthly lead limit reached (${limits.leadsPerMonth}). Upgrade to add more leads.`);
+        if (limits.leadsPerMonth !== 99999 && sub.leadsUsed >= limits.leadsPerMonth + sub.bonusLeads) {
+          throw new Error(`Monthly lead limit reached (${limits.leadsPerMonth}). Upgrade or buy a lead top-up to add more leads.`);
         }
 
         const lead = await createLead({ ...input, userId: ctx.user.id });

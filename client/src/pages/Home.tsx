@@ -16,7 +16,7 @@ const PAIN_KEYWORDS = ["scale", "burnout", "growth", "hiring"];
 
 const PLANS = [
   { name: "Free", price: "$0", period: "forever", features: ["25 leads/month", "ICP query builder", "CSV export"] },
-  { name: "Paid Plans", price: "From $47", period: "/mo", features: ["Verified emails + phone", "Deep Research", "Choose Pro, Pro+, or Agency"], highlight: true },
+  { name: "Paid Plans", price: "From $17", period: "/mo", features: ["100 leads/month", "Or a $27 one-time top-up", "No contracts, cancel anytime"], highlight: true },
   { name: "Prompt Pack", price: "$49", period: "one-time", features: ["Outreach email prompts", "Works with any plan", "Instant PDF download"] },
 ];
 

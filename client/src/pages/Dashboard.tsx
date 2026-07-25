@@ -1,6 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { getLoginUrl } from "@/const";
 import {
   Download, Zap, Trash2, Mail, Phone, ExternalLink,
@@ -61,6 +61,31 @@ export default function Dashboard() {
     onError: (e) => toast.error(e.message),
   });
 
+  const topUpCheckoutMutation = trpc.subscription.createTopUpCheckout.useMutation({
+    onSuccess: (data) => { if (data.url) window.location.href = data.url; },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const verifyTopUpMutation = trpc.subscription.verifyTopUp.useMutation({
+    onSuccess: (data) => {
+      refetchSub();
+      if (data.added > 0) toast.success(`Added ${data.added} bonus leads to your account!`);
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const verifiedTopUpRef = useRef<string | null>(null);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("topup_session");
+    if (sessionId && verifiedTopUpRef.current !== sessionId) {
+      verifiedTopUpRef.current = sessionId;
+      verifyTopUpMutation.mutate({ sessionId });
+      window.history.replaceState({}, "", "/dashboard");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const exportCSV = useCallback(() => {
     if (!leadsData?.items?.length) return;
     const headers = ["Name","Title","Company","LinkedIn URL","Email (Unverified)","Email (Verified)","Phone","Location","Score","Enrichment Status"];
@@ -104,8 +129,10 @@ export default function Dashboard() {
   const plan = (sub?.plan ?? "free") as string;
   const leadsUsed = sub?.leadsUsed ?? 0;
   const leadsLimit = sub?.limits?.leadsPerMonth ?? 25;
+  const bonusLeads = sub?.bonusLeads ?? 0;
+  const effectiveLimit = leadsLimit === 99999 ? leadsLimit : leadsLimit + bonusLeads;
   const leadsRemaining = sub?.leadsRemaining ?? 25;
-  const usagePct = leadsLimit === 99999 ? 0 : Math.min(100, Math.round((leadsUsed / leadsLimit) * 100));
+  const usagePct = effectiveLimit === 99999 ? 0 : Math.min(100, Math.round((leadsUsed / effectiveLimit) * 100));
   const canEnrich = sub?.limits?.hasUnverifiedEmail || sub?.limits?.hasVerifiedEmail;
   const hasVerified = sub?.limits?.hasVerifiedEmail;
 
@@ -148,15 +175,19 @@ export default function Dashboard() {
           <div className="mb-6 p-4 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>Monthly Usage</span>
-              <span className="text-xs" style={{ color: "oklch(0.60 0.008 260)" }}>{leadsUsed} / {leadsLimit} leads</span>
+              <span className="text-xs" style={{ color: "oklch(0.60 0.008 260)" }}>
+                {leadsUsed} / {effectiveLimit} leads{bonusLeads > 0 ? ` (includes ${bonusLeads} top-up)` : ""}
+              </span>
             </div>
             <div className="h-2 rounded-full overflow-hidden" style={{ background: "oklch(0.22 0.012 260)" }}>
               <div className="h-full rounded-full transition-all duration-500"
                 style={{ width: `${usagePct}%`, background: usagePct > 80 ? "oklch(0.65 0.22 25)" : "oklch(0.78 0.18 85)" }} />
             </div>
             {usagePct > 80 && (
-              <div className="mt-2 flex items-center gap-2 text-xs" style={{ color: "oklch(0.65 0.22 25)" }}>
-                <AlertCircle size={12} /> Running low — <button onClick={() => checkoutMutation.mutate({ plan: plan === "free" ? "pro" : plan === "pro" ? "pro_plus" : "agency" } as { plan: "pro" | "pro_plus" | "agency" })} className="underline font-semibold">upgrade now</button>
+              <div className="mt-2 flex items-center gap-2 text-xs flex-wrap" style={{ color: "oklch(0.65 0.22 25)" }}>
+                <AlertCircle size={12} /> Running low —
+                <button onClick={() => topUpCheckoutMutation.mutate()} className="underline font-semibold">buy 100 more leads ($27)</button>
+                {plan === "free" && (<>or <button onClick={() => checkoutMutation.mutate({ plan: "pro" })} className="underline font-semibold">go Pro ($17/mo)</button></>)}
               </div>
             )}
           </div>
@@ -311,16 +342,23 @@ export default function Dashboard() {
           <div className="mt-6 p-5 rounded-lg" style={{ background: "oklch(0.78 0.18 85 / 0.06)", border: "1px solid oklch(0.78 0.18 85 / 0.25)" }}>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <p className="font-bold" style={{ fontFamily: "Archivo, sans-serif", color: "oklch(0.92 0.005 260)" }}>Want emails and phone numbers?</p>
+                <p className="font-bold" style={{ fontFamily: "Archivo, sans-serif", color: "oklch(0.92 0.005 260)" }}>Need more than 25 leads a month?</p>
                 <p className="text-sm mt-1" style={{ color: "oklch(0.60 0.008 260)" }}>
-                  Scout Pro adds unverified emails. Scout Pro+ adds verified emails + phone via Apollo. Agency is unlimited.
+                  Go Pro for 100 fresh leads every month, or buy a one-time top-up whenever you need a quick batch.
                 </p>
               </div>
-              <button onClick={() => checkoutMutation.mutate({ plan: "pro" })}
-                className="px-5 py-2.5 rounded font-bold text-sm whitespace-nowrap"
-                style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
-                Upgrade to Pro — $47/mo
-              </button>
+              <div className="flex gap-2 flex-wrap">
+                <button onClick={() => topUpCheckoutMutation.mutate()}
+                  className="px-5 py-2.5 rounded font-bold text-sm whitespace-nowrap"
+                  style={{ background: "oklch(0.22 0.012 260)", color: "oklch(0.80 0.008 260)", border: "1px solid oklch(0.32 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+                  Top Up — $27
+                </button>
+                <button onClick={() => checkoutMutation.mutate({ plan: "pro" })}
+                  className="px-5 py-2.5 rounded font-bold text-sm whitespace-nowrap"
+                  style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+                  Go Pro — $17/mo
+                </button>
+              </div>
             </div>
           </div>
         )}

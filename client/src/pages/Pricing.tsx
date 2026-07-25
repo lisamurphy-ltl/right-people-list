@@ -12,64 +12,42 @@ const FREE_TIER = {
   leads: "25 leads / month",
   features: [
     "ICP query builder",
-    "Google search integration",
-    "Basic profile data (name, title, LinkedIn URL)",
-    "Relevance scoring",
+    "Automated LinkedIn profile search",
+    "Relevance scoring (High/Medium/Low)",
     "CSV export",
     "ICP Clarity Guide",
   ],
-  locked: ["Unverified emails", "Verified emails", "Phone numbers", "Deep Research", "Team seats"],
+  locked: ["More than 25 leads / month"],
 };
 
-const PAID_TIERS = [
+const PAID_OPTIONS = [
   {
-    key: "pro" as const,
-    name: "Scout Pro",
-    price: "$47",
+    key: "monthly" as const,
+    name: "Monthly",
+    price: "$17",
     period: "/ month",
-    leads: "150 leads / month",
+    leads: "100 leads / month, every month",
     features: [
       "Everything in Free",
-      "Unverified emails (pattern-matched)",
-      "Company domain lookup",
-      "150 leads per month",
-      "Priority support",
-    ],
-    locked: ["Verified emails", "Phone numbers", "Deep Research", "Team seats"],
-    cta: "Start Scout Pro",
-  },
-  {
-    key: "pro_plus" as const,
-    name: "Scout Pro+",
-    price: "$127",
-    period: "/ month",
-    leads: "500 leads / month",
-    features: [
-      "Everything in Scout Pro",
-      "Verified emails via Apollo API",
-      "Phone numbers via Apollo API",
-      "500 leads per month",
-      "Deep Research — AI finds 100 named leads with bios + contact info",
-    ],
-    locked: ["Team seats"],
-    cta: "Start Scout Pro+",
-  },
-  {
-    key: "agency" as const,
-    name: "Agency",
-    price: "$297",
-    period: "/ month",
-    leads: "Unlimited leads",
-    features: [
-      "Everything in Scout Pro+",
-      "Unlimited leads per month",
-      "Unlimited saved ICP profiles",
-      "Deep Research — unlimited AI research runs",
-      "Up to 5 team seats",
-      "White-label CSV export",
+      "100 fresh leads per month",
+      "Cancel anytime",
     ],
     locked: [],
-    cta: "Start Agency",
+    cta: "Go Pro — $17/mo",
+  },
+  {
+    key: "topup" as const,
+    name: "One-Time Top-Up",
+    price: "$27",
+    period: "one-time",
+    leads: "100 leads, added to your account once",
+    features: [
+      "Everything in Free",
+      "100 leads added on top of your current plan",
+      "No subscription, no commitment",
+    ],
+    locked: [],
+    cta: "Buy 100 Leads — $27",
   },
 ];
 
@@ -94,7 +72,7 @@ function FeatureList({ features, locked }: { features: string[]; locked: string[
 
 export default function Pricing() {
   const { isAuthenticated } = useAuth();
-  const [selectedPaid, setSelectedPaid] = useState<typeof PAID_TIERS[number]["key"]>("pro_plus");
+  const [selectedPaid, setSelectedPaid] = useState<typeof PAID_OPTIONS[number]["key"]>("monthly");
 
   const promptPackMutation = trpc.promptPack.createCheckout.useMutation({
     onSuccess: (data) => { if (data.url) window.location.href = data.url; },
@@ -106,16 +84,23 @@ export default function Pricing() {
     onError: (e) => toast.error(e.message),
   });
 
+  const topUpMutation = trpc.subscription.createTopUpCheckout.useMutation({
+    onSuccess: (data) => { if (data.url) window.location.href = data.url; },
+    onError: (e) => toast.error(e.message),
+  });
+
   const handleFreeCTA = () => {
     window.location.href = isAuthenticated ? "/dashboard" : getLoginUrl();
   };
 
   const handlePaidCTA = () => {
     if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
-    checkoutMutation.mutate({ plan: selectedPaid });
+    if (selectedPaid === "monthly") checkoutMutation.mutate({ plan: "pro" });
+    else topUpMutation.mutate();
   };
 
-  const activeTier = PAID_TIERS.find(t => t.key === selectedPaid)!;
+  const paidPending = checkoutMutation.isPending || topUpMutation.isPending;
+  const activeTier = PAID_OPTIONS.find(t => t.key === selectedPaid)!;
 
   return (
     <div className="min-h-screen" style={{ background: "oklch(0.13 0.012 260)" }}>
@@ -138,7 +123,7 @@ export default function Pricing() {
             Find your people.<br /><span style={{ color: "oklch(0.78 0.18 85)" }}>Close more deals.</span>
           </h1>
           <p className="mt-4 text-base max-w-lg mx-auto" style={{ color: "oklch(0.60 0.008 260)" }}>
-            Start free. Upgrade when you're ready for verified emails and phone numbers. No contracts, cancel anytime.
+            Start free with 25 leads a month. Need more? Go monthly or grab a one-time top-up — no contracts, cancel anytime.
           </p>
         </div>
 
@@ -168,7 +153,7 @@ export default function Pricing() {
             </div>
 
             <div className="mb-4 flex gap-1.5 p-1 rounded-lg" style={{ background: "oklch(0.14 0.012 260)" }}>
-              {PAID_TIERS.map(t => (
+              {PAID_OPTIONS.map(t => (
                 <button key={t.key} onClick={() => setSelectedPaid(t.key)}
                   className="flex-1 py-1.5 rounded-md text-xs font-bold transition-all"
                   style={{
@@ -176,7 +161,7 @@ export default function Pricing() {
                     color: selectedPaid === t.key ? "oklch(0.13 0.012 260)" : "oklch(0.60 0.008 260)",
                     fontFamily: "Archivo, sans-serif",
                   }}>
-                  {t.name.replace("Scout ", "")}
+                  {t.name}
                 </button>
               ))}
             </div>
@@ -191,10 +176,10 @@ export default function Pricing() {
             <FeatureList features={activeTier.features} locked={activeTier.locked} />
             <button
               onClick={handlePaidCTA}
-              disabled={checkoutMutation.isPending}
+              disabled={paidPending}
               className="w-full py-3 rounded font-bold text-sm transition-all"
               style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
-              {checkoutMutation.isPending ? "Loading..." : activeTier.cta}
+              {paidPending ? "Loading..." : activeTier.cta}
             </button>
           </div>
 

@@ -67,7 +67,7 @@ export async function touchLastSignedIn(userId: number) {
 
 export const PLAN_LIMITS = {
   free:     { leadsPerMonth: 25,   hasUnverifiedEmail: false, hasVerifiedEmail: false, hasPhone: false, teamSeats: 1 },
-  pro:      { leadsPerMonth: 150,  hasUnverifiedEmail: true,  hasVerifiedEmail: false, hasPhone: false, teamSeats: 1 },
+  pro:      { leadsPerMonth: 100,  hasUnverifiedEmail: true,  hasVerifiedEmail: false, hasPhone: false, teamSeats: 1 },
   pro_plus: { leadsPerMonth: 500,  hasUnverifiedEmail: true,  hasVerifiedEmail: true,  hasPhone: true,  teamSeats: 1 },
   agency:   { leadsPerMonth: 99999,hasUnverifiedEmail: true,  hasVerifiedEmail: true,  hasPhone: true,  teamSeats: 5 },
 } as const;
@@ -96,6 +96,22 @@ export async function incrementLeadsUsed(userId: number, count = 1) {
   if (!db) throw new Error("Database not available");
   const sub = await getOrCreateSubscription(userId);
   await db.update(subscriptions).set({ leadsUsed: sub.leadsUsed + count }).where(eq(subscriptions.userId, userId));
+}
+
+/**
+ * Credits bonus leads for a top-up purchase, but only once per Stripe
+ * session — guards against the success page being reloaded and re-crediting.
+ * Returns false (no-op) if this sessionId was already processed.
+ */
+export async function addBonusLeadsOnce(userId: number, count: number, sessionId: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const sub = await getOrCreateSubscription(userId);
+  if (sub.lastTopUpSessionId === sessionId) return false;
+  await db.update(subscriptions)
+    .set({ bonusLeads: sub.bonusLeads + count, lastTopUpSessionId: sessionId })
+    .where(eq(subscriptions.userId, userId));
+  return true;
 }
 
 // ── Leads ──────────────────────────────────────────────────────────────────

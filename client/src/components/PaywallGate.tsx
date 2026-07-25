@@ -53,7 +53,12 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
     onError: (e) => toast.error(e.message),
   });
 
-  const isAtLimit = sub && sub.limits.leadsPerMonth !== 99999 && sub.leadsUsed >= sub.limits.leadsPerMonth;
+  const topUpMutation = trpc.subscription.createTopUpCheckout.useMutation({
+    onSuccess: (data) => { if (data.url) window.location.href = data.url; },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const isAtLimit = sub && sub.limits.leadsPerMonth !== 99999 && sub.leadsRemaining <= 0;
   const isBlocked = !isAuthenticated || isAtLimit;
 
   const handleClick = () => {
@@ -62,25 +67,6 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
       return;
     }
     setShowModal(true);
-  };
-
-  const nextPlan = () => {
-    if (!sub) return "pro";
-    if (sub.plan === "free") return "pro";
-    if (sub.plan === "pro") return "pro_plus";
-    return "agency";
-  };
-
-  const nextPlanLabel = () => {
-    const p = nextPlan();
-    return PLAN_LABEL[p] ?? "Pro";
-  };
-
-  const nextPlanPrice = () => {
-    const p = nextPlan();
-    if (p === "pro") return "$47/mo";
-    if (p === "pro_plus") return "$127/mo";
-    return "$297/mo";
   };
 
   return (
@@ -113,7 +99,7 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
               {!isAuthenticated ? (
                 <>
                   <p className="text-sm leading-relaxed mb-5" style={{ color: "oklch(0.65 0.008 260)" }}>
-                    The Right-People List is <strong style={{ color: "oklch(0.90 0.005 260)" }}>free to start</strong> — 25 leads per month, no credit card required. Sign in to track your leads, save your searches, and unlock enrichment when you're ready.
+                    The Right-People List is <strong style={{ color: "oklch(0.90 0.005 260)" }}>free to start</strong> — 25 leads per month, no credit card required. Sign in to track your leads and save your searches.
                   </p>
                   <div className="p-4 rounded-lg mb-5"
                     style={{ background: "oklch(0.78 0.18 85 / 0.08)", border: "1px solid oklch(0.78 0.18 85 / 0.25)" }}>
@@ -146,22 +132,30 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
                     style={{ background: "oklch(0.78 0.18 85 / 0.08)", border: "1px solid oklch(0.78 0.18 85 / 0.25)" }}>
                     <p className="text-xs font-semibold uppercase tracking-widest mb-1"
                       style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>
-                      Upgrade to {nextPlanLabel()}
+                      Need more leads right now?
                     </p>
                     <p className="text-xs" style={{ color: "oklch(0.60 0.008 260)" }}>
-                      {nextPlan() === "pro" && "150 leads/month + unverified emails"}
-                      {nextPlan() === "pro_plus" && "500 leads/month + verified emails + phone numbers"}
-                      {nextPlan() === "agency" && "Unlimited leads + 5 team seats + white-label export"}
+                      Buy a one-time top-up, or go Pro for 100 fresh leads every month.
                     </p>
                   </div>
 
                   <button
-                    onClick={() => checkoutMutation.mutate({ plan: nextPlan() as "pro" | "pro_plus" | "agency" })}
-                    disabled={checkoutMutation.isPending}
-                    className="flex items-center justify-center gap-2 w-full py-3 rounded font-bold text-sm mb-3"
+                    onClick={() => topUpMutation.mutate()}
+                    disabled={topUpMutation.isPending}
+                    className="flex items-center justify-center gap-2 w-full py-3 rounded font-bold text-sm mb-2"
                     style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
-                    <Zap size={15} /> Upgrade to {nextPlanLabel()} — {nextPlanPrice()}
+                    <Zap size={15} /> Buy 100 Leads — $27
                   </button>
+
+                  {sub?.plan === "free" && (
+                    <button
+                      onClick={() => checkoutMutation.mutate({ plan: "pro" })}
+                      disabled={checkoutMutation.isPending}
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded font-bold text-sm mb-3"
+                      style={{ background: "oklch(0.22 0.012 260)", color: "oklch(0.80 0.008 260)", border: "1px solid oklch(0.32 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+                      Go Pro — $17/mo (100 leads/mo)
+                    </button>
+                  )}
 
                   <button onClick={() => setShowModal(false)}
                     className="w-full py-2.5 rounded text-sm font-semibold"

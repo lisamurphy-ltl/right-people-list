@@ -31,6 +31,11 @@ export const subscriptions = mysqlTable("subscriptions", {
   currentPeriodStart: timestamp("currentPeriodStart"),
   currentPeriodEnd: timestamp("currentPeriodEnd"),
   leadsUsed: int("leadsUsed").default(0).notNull(),
+  // One-time lead top-up purchases credited for the current month; added
+  // on top of the plan's monthly allotment, reset to 0 whenever leadsUsed resets.
+  bonusLeads: int("bonusLeads").default(0).notNull(),
+  // Guards against re-crediting bonusLeads if the checkout success page reloads.
+  lastTopUpSessionId: varchar("lastTopUpSessionId", { length: 128 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
