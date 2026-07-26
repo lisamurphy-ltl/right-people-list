@@ -11,6 +11,7 @@ import {
   addBonusLeadsOnce,
   createLead,
   createUser,
+  findIndexedCandidates,
   getLeadById,
   getLeadsByUser,
   getLeadsCount,
@@ -21,9 +22,11 @@ import {
   touchLastSignedIn,
   updateLead,
   updateSubscription,
+  upsertIndexedCandidates,
 } from "./db";
 import { apolloEnrich, guessEmail } from "./enrichment";
 import { searchLinkedInProfiles } from "./leadSearch";
+import { logLeadsToSheet, SheetLeadRow } from "./sheetLog";
 
 function buildIcpQuery(roles: string[], industries: string[], pains: string[], location: string, companySize?: string): string {
   const roleStr = roles.length > 0 ? `(${roles.map(r => `"${r}"`).join(" OR ")})` : `("Founder" OR "Owner" OR "CEO")`;
@@ -313,31 +316,95 @@ export const appRouter = router({
         }
 
         const query = buildIcpQuery(input.roles, input.industries, input.pains, input.location, input.companySize);
-        const candidates = await searchLinkedInProfiles(query, Math.min(remaining, 10));
+        const cap = Math.min(remaining, 10);
 
         const existing = await getLeadsByUser(ctx.user.id, 1000, 0);
-        const existingUrls = new Set(existing.map(l => l.linkedinUrl));
+        const existingUrls = new Set(existing.map(l => l.linkedinUrl).filter((u): u is string => !!u));
 
         const painMatchCount = (text: string | null) =>
           input.pains.filter(p => text?.toLowerCase().includes(p.toLowerCase())).length;
+        const scoreFor = (text: string | null) =>
+          painMatchCount(text) >= 2 ? "high" as const : painMatchCount(text) === 1 ? "medium" as const : "low" as const;
+
+        // Tier 1: check the shared index of already-scraped leads first, so
+        // matching ICP criteria don't cost another SerpApi call.
+        const indexed = await findIndexedCandidates({
+          industries: input.industries,
+          location: input.location,
+          excludeUrls: Array.from(existingUrls),
+          limit: cap,
+        });
 
         let added = 0;
-        for (const c of candidates) {
-          if (existingUrls.has(c.linkedinUrl)) continue;
-          if (added >= remaining) break;
+        for (const row of indexed) {
+          if (added >= cap) break;
           await createLead({
             userId: ctx.user.id,
-            fullName: c.fullName,
-            title: c.title ?? undefined,
-            linkedinUrl: c.linkedinUrl,
-            relevanceScore: painMatchCount(c.title) >= 2 ? "high" : painMatchCount(c.title) === 1 ? "medium" : "low",
-            searchQuery: query,
+            fullName: row.fullName,
+            title: row.title ?? undefined,
+            linkedinUrl: row.linkedinUrl,
+            relevanceScore: scoreFor(row.title),
+            searchQuery: row.searchQuery ?? query,
           });
           added++;
         }
+
+        // Tier 2: only hit SerpApi for the shortfall the index couldn't cover.
+        const shortfall = cap - added;
+        let freshFound = 0;
+        if (shortfall > 0) {
+          const candidates = await searchLinkedInProfiles(query, shortfall);
+          freshFound = candidates.length;
+          const newlyIndexed: SheetLeadRow[] = [];
+
+          for (const c of candidates) {
+            if (existingUrls.has(c.linkedinUrl)) continue;
+            if (added >= cap) break;
+            const relevanceScore = scoreFor(c.title);
+            await createLead({
+              userId: ctx.user.id,
+              fullName: c.fullName,
+              title: c.title ?? undefined,
+              linkedinUrl: c.linkedinUrl,
+              relevanceScore,
+              searchQuery: query,
+            });
+            added++;
+
+            newlyIndexed.push({
+              fullName: c.fullName,
+              title: c.title,
+              company: null,
+              linkedinUrl: c.linkedinUrl,
+              industry: input.industries.join(", "),
+              location: input.location,
+              companySize: input.companySize ?? null,
+              relevanceScore,
+              searchQuery: query,
+              source: "serpapi",
+            });
+          }
+
+          if (newlyIndexed.length > 0) {
+            await upsertIndexedCandidates(newlyIndexed.map(r => ({
+              fullName: r.fullName,
+              title: r.title,
+              company: r.company,
+              linkedinUrl: r.linkedinUrl,
+              industry: r.industry,
+              location: r.location,
+              companySize: r.companySize,
+              searchQuery: r.searchQuery,
+              source: r.source,
+            })));
+            // Fire-and-forget: never let sheet-logging block or fail the search.
+            void logLeadsToSheet(newlyIndexed);
+          }
+        }
+
         if (added > 0) await incrementLeadsUsed(ctx.user.id, added);
 
-        return { added, found: candidates.length, query };
+        return { added, found: indexed.length + freshFound, fromIndex: indexed.length, query };
       }),
 
     add: protectedProcedure

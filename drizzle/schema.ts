@@ -126,3 +126,25 @@ export const deepResearchRuns = mysqlTable("deep_research_runs", {
 
 export type DeepResearchRun = typeof deepResearchRuns.$inferSelect;
 export type InsertDeepResearchRun = typeof deepResearchRuns.$inferInsert;
+
+// ── Scraped Lead Index ──────────────────────────────────────────────────────
+// Shared across all users: every profile SerpApi ever returns gets cached here
+// so future searches with overlapping ICP criteria can be served without a
+// fresh SerpApi call. Tagged with the ICP criteria active when it was scraped
+// (not parsed from the profile itself, since SerpApi only gives us a title line).
+export const scrapedLeadsIndex = mysqlTable("scraped_leads_index", {
+  id: int("id").autoincrement().primaryKey(),
+  fullName: varchar("fullName", { length: 256 }).notNull(),
+  title: varchar("title", { length: 256 }),
+  company: varchar("company", { length: 256 }),
+  linkedinUrl: varchar("linkedinUrl", { length: 512 }).notNull().unique(),
+  industry: text("industry"),
+  location: varchar("location", { length: 256 }),
+  companySize: varchar("companySize", { length: 64 }),
+  searchQuery: text("searchQuery"),
+  source: mysqlEnum("source", ["serpapi", "llm"]).default("serpapi").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ScrapedLeadIndexRow = typeof scrapedLeadsIndex.$inferSelect;
+export type InsertScrapedLeadIndexRow = typeof scrapedLeadsIndex.$inferInsert;

@@ -1,6 +1,6 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, like, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { enrichmentJobs, InsertEnrichmentJob, InsertLead, InsertSubscription, leads, subscriptions, users } from "../drizzle/schema";
+import { enrichmentJobs, InsertEnrichmentJob, InsertLead, InsertScrapedLeadIndexRow, InsertSubscription, leads, scrapedLeadsIndex, subscriptions, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -150,6 +150,44 @@ export async function getLeadsCount(userId: number) {
   if (!db) return 0;
   const result = await db.select().from(leads).where(eq(leads.userId, userId));
   return result.length;
+}
+
+// ── Scraped Lead Index ───────────────────────────────────────────────────────
+// Shared cache of every profile SerpApi has ever returned, so a new search
+// with overlapping ICP criteria can be served without another SerpApi call.
+
+export async function findIndexedCandidates(params: {
+  industries: string[];
+  location: string;
+  excludeUrls: string[];
+  limit: number;
+}) {
+  const db = await getDb();
+  if (!db || params.limit <= 0) return [];
+
+  const conditions = [];
+  if (params.industries.length > 0) {
+    conditions.push(or(...params.industries.map(i => like(scrapedLeadsIndex.industry, `%${i}%`))));
+  }
+  if (params.location) {
+    conditions.push(like(scrapedLeadsIndex.location, `%${params.location}%`));
+  }
+
+  const rows = await db.select().from(scrapedLeadsIndex)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .limit(params.limit + params.excludeUrls.length);
+
+  const excludeSet = new Set(params.excludeUrls);
+  return rows.filter(r => !excludeSet.has(r.linkedinUrl)).slice(0, params.limit);
+}
+
+export async function upsertIndexedCandidates(rows: InsertScrapedLeadIndexRow[]) {
+  const db = await getDb();
+  if (!db || rows.length === 0) return;
+  for (const row of rows) {
+    await db.insert(scrapedLeadsIndex).values(row)
+      .onDuplicateKeyUpdate({ set: { title: row.title, company: row.company } });
+  }
 }
 
 // ── Enrichment Jobs ────────────────────────────────────────────────────────
