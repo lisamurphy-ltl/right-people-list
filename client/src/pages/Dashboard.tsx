@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import AddLeadModal from "@/components/AddLeadModal";
+import CrossPromoBanner from "@/components/CrossPromoBanner";
 import PaywallGate from "@/components/PaywallGate";
 import QueryBuilder from "@/components/QueryBuilder";
 
@@ -153,6 +154,7 @@ export default function Dashboard() {
       </nav>
 
       <div className="pt-20 container py-8">
+        <CrossPromoBanner />
         <QueryBuilder />
 
         {/* Stats Row */}
