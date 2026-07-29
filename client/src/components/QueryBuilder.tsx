@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { Copy, Check, Loader2, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Loader2, Sparkles } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -8,39 +8,6 @@ const INDUSTRIES = ["Coaching", "Consulting", "Marketing Agency", "PR Agency", "
 const PAIN_KEYWORDS = ["scale", "scaling", "burnout", "growth", "overworked", "systems", "hiring", "stuck", "overwhelmed", "team", "delegation", "revenue"];
 const LOCATIONS = ["United States", "Canada", "United Kingdom", "Australia", "Remote"];
 const COMPANY_SIZES = ["Solopreneur", "Boutique agency", "Small team", "Growing team", "Established firm"];
-
-function buildQuery(roles: string[], industries: string[], pains: string[], location: string, companySize: string): string {
-  const roleStr = roles.length > 0 ? `(${roles.map(r => `"${r}"`).join(" OR ")})` : `("Founder" OR "Owner" OR "CEO")`;
-  const indStr = industries.length > 0 ? `(${industries.map(i => `"${i}"`).join(" OR ")})` : `("Consulting" OR "Coaching" OR "Agency")`;
-  const painStr = pains.length > 0 ? `(${pains.slice(0, 5).map(p => `"${p}"`).join(" OR ")})` : `("scale" OR "burnout" OR "growth")`;
-  const locStr = location ? `"${location}"` : `"United States"`;
-  const sizeStr = companySize ? ` "${companySize.toLowerCase()}"` : "";
-  return `site:linkedin.com/in/ ${roleStr} ${indStr} ${painStr} ${locStr}${sizeStr}`;
-}
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }, [text]);
-  return (
-    <button
-      onClick={handleCopy}
-      className="flex items-center gap-2 px-3 py-1.5 rounded text-sm font-medium transition-all duration-200"
-      style={{
-        background: copied ? "oklch(0.78 0.18 85 / 0.15)" : "oklch(0.28 0.012 260)",
-        color: copied ? "oklch(0.78 0.18 85)" : "oklch(0.72 0.005 260)",
-        border: `1px solid ${copied ? "oklch(0.78 0.18 85 / 0.5)" : "oklch(0.35 0.012 260)"}`,
-      }}
-    >
-      {copied ? <Check size={14} /> : <Copy size={14} />}
-      {copied ? "Copied!" : "Copy Query"}
-    </button>
-  );
-}
 
 function TagSelector({
   label, options, selected, onToggle,
@@ -84,7 +51,6 @@ export default function QueryBuilder() {
     set(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
   };
 
-  const query = buildQuery(roles, industries, pains, location, companySize);
   const utils = trpc.useUtils();
 
   const searchMutation = trpc.leads.runSearch.useMutation({
@@ -160,13 +126,20 @@ export default function QueryBuilder() {
         </div>
 
         <div className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>
-              Your Search Query
-            </p>
-            <CopyButton text={query} />
+          <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>
+            We'll Search For
+          </p>
+          <div className="mb-5 min-h-[100px] p-4 rounded-lg text-sm leading-relaxed" style={{ background: "oklch(0.14 0.012 260)", border: "1px solid oklch(0.26 0.012 260)", color: "oklch(0.78 0.008 260)" }}>
+            <span style={{ color: "oklch(0.92 0.005 260)", fontWeight: 700 }}>{roles.length > 0 ? roles.join(", ") : "Founders, Owners, CEOs"}</span>
+            {" "}in{" "}
+            <span style={{ color: "oklch(0.92 0.005 260)", fontWeight: 700 }}>{industries.length > 0 ? industries.join(", ") : "Consulting, Coaching, Agency"}</span>
+            {" "}dealing with{" "}
+            <span style={{ color: "oklch(0.92 0.005 260)", fontWeight: 700 }}>{pains.length > 0 ? pains.slice(0, 5).join(", ") : "scale, burnout, growth"}</span>
+            {" "}near{" "}
+            <span style={{ color: "oklch(0.92 0.005 260)", fontWeight: 700 }}>{location || "United States"}</span>
+            {companySize && <>, <span style={{ color: "oklch(0.92 0.005 260)", fontWeight: 700 }}>{companySize.toLowerCase()}</span></>}
+            .
           </div>
-          <div className="query-block mb-5 min-h-[100px]">{query}</div>
           <button
             onClick={() => searchMutation.mutate({ roles, industries, pains, location, companySize })}
             disabled={searchMutation.isPending}
