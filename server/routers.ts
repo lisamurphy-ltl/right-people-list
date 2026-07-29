@@ -12,6 +12,7 @@ import {
   createLead,
   createUser,
   findIndexedCandidates,
+  getIcpProfile,
   getLeadById,
   getLeadsByUser,
   getLeadsCount,
@@ -19,6 +20,7 @@ import {
   getUserByEmail,
   incrementLeadsUsed,
   PLAN_LIMITS,
+  saveIcpProfile,
   touchLastSignedIn,
   updateLead,
   updateSubscription,
@@ -28,13 +30,43 @@ import { apolloEnrich, guessEmail } from "./enrichment";
 import { searchLinkedInProfiles } from "./leadSearch";
 import { logLeadsToSheet, SheetLeadRow } from "./sheetLog";
 
-function buildIcpQuery(roles: string[], industries: string[], pains: string[], location: string, companySize?: string): string {
-  const roleStr = roles.length > 0 ? `(${roles.map(r => `"${r}"`).join(" OR ")})` : `("Founder" OR "Owner" OR "CEO")`;
-  const indStr = industries.length > 0 ? `(${industries.map(i => `"${i}"`).join(" OR ")})` : `("Consulting" OR "Coaching" OR "Agency")`;
-  const painStr = pains.length > 0 ? `(${pains.slice(0, 5).map(p => `"${p}"`).join(" OR ")})` : `("scale" OR "burnout" OR "growth")`;
-  const locStr = location ? `"${location}"` : `"United States"`;
-  const sizeStr = companySize ? ` "${companySize.toLowerCase()}"` : "";
-  return `site:linkedin.com/in/ ${roleStr} ${indStr} ${painStr} ${locStr}${sizeStr}`;
+// Company-size descriptor a real LinkedIn bio might actually contain as
+// literal text — headcount ranges themselves never appear in profile snippets.
+const HEADCOUNT_DESCRIPTOR: Record<string, string> = {
+  "1 (solo)": "solopreneur",
+  "2–10": "small team",
+  "11–50": "growing team",
+  "51–200": "established company",
+  "201–500": "established company",
+};
+
+type IcpAnswers = Record<string, string | string[] | undefined>;
+
+function asArray(v: string | string[] | undefined): string[] {
+  if (!v) return [];
+  return Array.isArray(v) ? v.filter(Boolean) : [v].filter(Boolean);
+}
+
+// Builds the ICP profile answers into a searchable Google/LinkedIn query.
+// Kept to titles + industries + location as required groups — every extra
+// required group multiplies how narrow the literal-text match has to be,
+// and Google search only matches literal text, not meaning. Company size
+// is included as a soft (optional) hint, not a requirement.
+function buildIcpQueryFromAnswers(a: IcpAnswers): { query: string; titles: string[]; industries: string[] } {
+  const titles = asArray(a.q10);
+  const industries = asArray(a.q4);
+  const specificLocation = (a.q7_metro as string) || (a.q7_state as string) || (a.q7_regional as string) || "";
+  const locationOptions = asArray(a.q7).filter(l => l !== "Global — location doesn't matter");
+  const headcounts = asArray(a.q6);
+  const sizeDescriptor = headcounts.map(h => HEADCOUNT_DESCRIPTOR[h]).find(Boolean);
+
+  const roleStr = titles.length > 0 ? `(${titles.map(t => `"${t}"`).join(" OR ")})` : `("Founder" OR "Owner" OR "CEO")`;
+  const indStr = industries.length > 0 ? `(${industries.map(i => `"${i}"`).join(" OR ")})` : "";
+  const locStr = specificLocation ? `"${specificLocation}"` : locationOptions.length > 0 ? `"${locationOptions[0]}"` : "";
+  const sizeStr = sizeDescriptor ? `"${sizeDescriptor}"` : "";
+
+  const query = ["site:linkedin.com/in/", roleStr, indStr, locStr, sizeStr].filter(Boolean).join(" ");
+  return { query, titles, industries };
 }
 
 const EMAIL_SCHEMA = z.string().trim().toLowerCase().email();
@@ -297,14 +329,18 @@ export const appRouter = router({
       }),
 
     runSearch: protectedProcedure
-      .input(z.object({
-        roles: z.array(z.string()),
-        industries: z.array(z.string()),
-        pains: z.array(z.string()),
-        location: z.string(),
-        companySize: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
+      .mutation(async ({ ctx }) => {
+        const profile = await getIcpProfile(ctx.user.id);
+        const answers: IcpAnswers = profile?.queryState ? JSON.parse(profile.queryState) : {};
+        const { query, titles, industries } = buildIcpQueryFromAnswers(answers);
+        const location = (answers.q7_metro as string) || (answers.q7_state as string) || (answers.q7_regional as string)
+          || asArray(answers.q7)[0] || "";
+        const companySize = asArray(answers.q6)[0] || "";
+
+        if (titles.length === 0 || industries.length === 0) {
+          throw new Error("Finish your ICP profile first (job titles and industries are required) before running a search.");
+        }
+
         const sub = await getOrCreateSubscription(ctx.user.id);
         const limits = PLAN_LIMITS[sub.plan];
         const remaining = limits.leadsPerMonth === 99999
@@ -315,22 +351,24 @@ export const appRouter = router({
           throw new Error(`Monthly lead limit reached (${limits.leadsPerMonth}). Upgrade or buy a lead top-up to run more searches.`);
         }
 
-        const query = buildIcpQuery(input.roles, input.industries, input.pains, input.location, input.companySize);
         const cap = Math.min(remaining, 10);
 
         const existing = await getLeadsByUser(ctx.user.id, 1000, 0);
         const existingUrls = new Set(existing.map(l => l.linkedinUrl).filter((u): u is string => !!u));
 
-        const painMatchCount = (text: string | null) =>
-          input.pains.filter(p => text?.toLowerCase().includes(p.toLowerCase())).length;
-        const scoreFor = (text: string | null) =>
-          painMatchCount(text) >= 2 ? "high" as const : painMatchCount(text) === 1 ? "medium" as const : "low" as const;
+        // Real signal, not a guess: does the candidate's own title actually
+        // contain one of the exact titles the user asked for.
+        const scoreFor = (text: string | null) => {
+          if (!text) return "medium" as const;
+          const lower = text.toLowerCase();
+          return titles.some(t => lower.includes(t.toLowerCase())) ? "high" as const : "medium" as const;
+        };
 
         // Tier 1: check the shared index of already-scraped leads first, so
         // matching ICP criteria don't cost another SerpApi call.
         const indexed = await findIndexedCandidates({
-          industries: input.industries,
-          location: input.location,
+          industries,
+          location,
           excludeUrls: Array.from(existingUrls),
           limit: cap,
         });
@@ -376,9 +414,9 @@ export const appRouter = router({
               title: c.title,
               company: null,
               linkedinUrl: c.linkedinUrl,
-              industry: input.industries.join(", "),
-              location: input.location,
-              companySize: input.companySize ?? null,
+              industry: industries.join(", "),
+              location,
+              companySize: companySize || null,
               relevanceScore,
               searchQuery: query,
               source: "serpapi",
@@ -485,6 +523,47 @@ export const appRouter = router({
         if (!db) throw new Error("Database not available");
         await db.delete(leadsTable).where(and(eq(leadsTable.id, input.leadId), eq(leadsTable.userId, ctx.user.id)));
         return { success: true };
+      }),
+  }),
+
+  icpProfile: router({
+    get: protectedProcedure.query(async ({ ctx }) => {
+      const profile = await getIcpProfile(ctx.user.id);
+      if (!profile) return null;
+      return {
+        ...profile,
+        answers: profile.queryState ? JSON.parse(profile.queryState) : {},
+      };
+    }),
+
+    save: protectedProcedure
+      .input(z.object({
+        answers: z.record(z.string(), z.union([z.string(), z.array(z.string())])),
+        industry: z.string().optional(),
+        roles: z.string().optional(),
+        businessSize: z.string().optional(),
+        geography: z.string().optional(),
+        activeSignals: z.string().optional(),
+        problemTheyreIn: z.string().optional(),
+        whatTheyLookLike: z.string().optional(),
+        isActive: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const profile = await saveIcpProfile(ctx.user.id, {
+          queryState: JSON.stringify(input.answers),
+          industry: input.industry,
+          roles: input.roles,
+          businessSize: input.businessSize,
+          geography: input.geography,
+          activeSignals: input.activeSignals,
+          problemTheyreIn: input.problemTheyreIn,
+          whatTheyLookLike: input.whatTheyLookLike,
+          isActive: input.isActive,
+        });
+        return {
+          ...profile,
+          answers: profile?.queryState ? JSON.parse(profile.queryState) : {},
+        };
       }),
   }),
 });

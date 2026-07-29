@@ -1,6 +1,6 @@
 import { and, eq, like, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { enrichmentJobs, InsertEnrichmentJob, InsertLead, InsertScrapedLeadIndexRow, InsertSubscription, leads, scrapedLeadsIndex, subscriptions, users } from "../drizzle/schema";
+import { enrichmentJobs, icpProfiles, InsertEnrichmentJob, InsertLead, InsertScrapedLeadIndexRow, InsertSubscription, leads, scrapedLeadsIndex, subscriptions, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -112,6 +112,41 @@ export async function addBonusLeadsOnce(userId: number, count: number, sessionId
     .set({ bonusLeads: sub.bonusLeads + count, lastTopUpSessionId: sessionId })
     .where(eq(subscriptions.userId, userId));
   return true;
+}
+
+// ── ICP Profiles ─────────────────────────────────────────────────────────
+// One profile per user, built up incrementally as they answer the ICP
+// Discovery Questionnaire. `queryState` holds the full raw answer set as
+// JSON; the other columns mirror the fields most relevant to building a
+// search, kept in sync on every save so they're queryable without parsing JSON.
+
+export async function getIcpProfile(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(icpProfiles).where(eq(icpProfiles.userId, userId)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function saveIcpProfile(userId: number, data: {
+  queryState: string;
+  industry?: string;
+  roles?: string;
+  businessSize?: string;
+  geography?: string;
+  activeSignals?: string;
+  problemTheyreIn?: string;
+  whatTheyLookLike?: string;
+  isActive?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const existing = await getIcpProfile(userId);
+  if (existing) {
+    await db.update(icpProfiles).set(data).where(eq(icpProfiles.id, existing.id));
+  } else {
+    await db.insert(icpProfiles).values({ userId, name: "My ICP", ...data });
+  }
+  return getIcpProfile(userId);
 }
 
 // ── Leads ──────────────────────────────────────────────────────────────────

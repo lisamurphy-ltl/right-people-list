@@ -70,6 +70,35 @@ LEADS_SHEET_WEBHOOK_SECRET=<not set yet — must match the Apps Script's WEBHOOK
 - DB auto-migration on boot
 - Custom domain + SSL
 
+## ICP Discovery Questionnaire (18 questions, replaced the old 5-tag builder)
+
+The old `QueryBuilder.tsx` (5 flat tags: roles/industries/pains/location/companySize,
+**with a visible raw Google search string + Copy Query button** — a real bug,
+it let anyone copy the search and skip paying, fixed the same day it was
+reported) is gone. It's replaced by `IcpWizard.tsx` + `icpQuestionnaire.ts`,
+which implement Lisa's full 18-question ICP Discovery Questionnaire (5
+sections: Ground Truth, Company, Person, Pain & Trigger, Filter) with
+conditional follow-ups, per-question Other boxes, and character limits,
+matching `ICP_Discovery_Questionnaire.md`.
+
+Answers persist to the existing (previously unused) `icpProfiles` table —
+one profile per user, autosaved per question, full raw answer set as JSON in
+`queryState`, key fields mirrored into named columns. `leads.runSearch` now
+reads the user's saved profile server-side instead of taking search params
+from the client at all — nothing about how the search is built is ever sent
+to or exposed in the browser.
+
+**What's NOT wired into the live search yet:** only job titles (Q10),
+industries (Q4), location (Q7), and a soft company-size hint (Q6) actually
+shape today's SerpApi/Google query — adding more required literal-text
+groups (seniority, company type, growth signals, etc.) would just return
+zero results, since Google search only matches literal text, not meaning.
+The rest of the 18 answers (pain language, trigger events, objections,
+disqualifiers, decision-maker mapping) are captured and stored for the
+one-sentence ICP summary and for whenever a structured-filter search source
+(Apollo, Google free search — discussed but not yet built, see Open Items)
+replaces literal-text Google dorking as the primary discovery method.
+
 ## Lead search index (3-tier search)
 
 `leads.runSearch` in `server/routers.ts` now checks a shared `scraped_leads_index`
@@ -114,6 +143,9 @@ should actually do before it gets built.
 3. Build the Stripe webhook (item 1 above) before real customers rely on this for money.
 4. Get the real Prompt Pack PDF from Lisa and upload it.
 5. Ask Lisa if she wants the old Pro+/Agency enrichment tiers fully removed from the code, or kept dormant for a future relaunch.
+6. **Apollo free People Search** was researched but not built. Apollo's search/filter endpoint (title, seniority, industry, headcount, revenue) doesn't consume credits — but their own docs show an *obfuscated* last name and no LinkedIn URL in the raw search response, which contradicts the "fully free" read. Waiting on Lisa to create a free Apollo account and send an API key so a real test call can confirm what the free tier actually returns before building it in as the primary discovery source (ahead of SerpApi).
+7. **Google's free Custom Search API (100/day)** was agreed as a second free discovery source, ahead of paid SerpApi — not built yet either. Needs Lisa to create a free Google Programmable Search Engine + API key (her Google login, can't be done for her).
+8. Deploy the Google Apps Script webhook (see "Lead search index" above) so scraped leads actually start writing to the "App-Scraped Leads" tab.
 
 ## Gotchas learned this session (save yourself the debugging time)
 

@@ -4,13 +4,13 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { getLoginUrl } from "@/const";
 import {
   Download, Zap, Trash2, Mail, Phone, ExternalLink,
-  TrendingUp, Users, Star, AlertCircle, Loader2, Plus
+  TrendingUp, Users, Star, AlertCircle, Loader2, Plus, Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 import AddLeadModal from "@/components/AddLeadModal";
 import CrossPromoBanner from "@/components/CrossPromoBanner";
+import IcpWizard, { IcpSummaryCard, isProfileReady } from "@/components/IcpWizard";
 import PaywallGate from "@/components/PaywallGate";
-import QueryBuilder from "@/components/QueryBuilder";
 
 const SCORE_COLOR: Record<string, string> = {
   high:   "oklch(0.65 0.18 145)",
@@ -35,12 +35,27 @@ const PLAN_COLOR: Record<string, string> = {
 export default function Dashboard() {
   const { user, isAuthenticated, loading } = useAuth();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingIcp, setEditingIcp] = useState(false);
 
   const { data: sub, refetch: refetchSub } = trpc.subscription.get.useQuery(undefined, { enabled: isAuthenticated });
+  const { data: icpProfile } = trpc.icpProfile.get.useQuery(undefined, { enabled: isAuthenticated });
   const { data: leadsData, refetch: refetchLeads, isLoading: leadsLoading } = trpc.leads.list.useQuery(
     { limit: 200, offset: 0 },
     { enabled: isAuthenticated }
   );
+
+  const searchMutation = trpc.leads.runSearch.useMutation({
+    onSuccess: (data) => {
+      refetchLeads();
+      refetchSub();
+      if (data.added > 0) {
+        toast.success(`Found ${data.found} matching profiles — added ${data.added} new leads to your list.`);
+      } else {
+        toast.info(`Found ${data.found} matching profiles, but they're all already in your list.`);
+      }
+    },
+    onError: (e) => toast.error(e.message),
+  });
 
   const enrichMutation = trpc.leads.enrich.useMutation({
     onSuccess: () => { refetchLeads(); toast.success("Lead enriched!"); },
@@ -155,7 +170,30 @@ export default function Dashboard() {
 
       <div className="pt-20 container py-8">
         <CrossPromoBanner />
-        <QueryBuilder />
+
+        {!icpProfile || !isProfileReady(icpProfile.answers ?? {}) || editingIcp ? (
+          <IcpWizard onComplete={() => setEditingIcp(false)} />
+        ) : (
+          <>
+            <IcpSummaryCard onEdit={() => setEditingIcp(true)} />
+            <div className="mb-8 p-6 rounded-lg flex items-center justify-between gap-4 flex-wrap"
+              style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
+              <p className="text-sm" style={{ color: "oklch(0.60 0.008 260)" }}>
+                We run the search for you and add matches straight to your list below.
+              </p>
+              <button
+                onClick={() => searchMutation.mutate()}
+                disabled={searchMutation.isPending}
+                className="flex items-center justify-center gap-2 px-6 py-3 rounded font-bold text-sm transition-all duration-160 shrink-0"
+                style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", opacity: searchMutation.isPending ? 0.7 : 1 }}
+              >
+                {searchMutation.isPending
+                  ? (<><Loader2 size={15} className="animate-spin" /> Finding your leads…</>)
+                  : (<><Sparkles size={15} /> Find My Leads</>)}
+              </button>
+            </div>
+          </>
+        )}
 
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
