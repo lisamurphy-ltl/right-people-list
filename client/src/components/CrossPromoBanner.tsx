@@ -21,9 +21,9 @@ const PROMOS: Promo[] = [
   },
   {
     key: "ai-visibility",
-    eyebrow: "Free Audit",
+    eyebrow: "AI Visibility Audit",
     headline: "See whether AI search engines like ChatGPT can actually find your business.",
-    cta: "Run your free AI Visibility Audit",
+    cta: "Run Your AI Visibility Audit",
     url: "https://aivisibility.limitedtolimitless.com/",
   },
   {
