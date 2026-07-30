@@ -188,7 +188,7 @@ export default function Home() {
               </div>
               <div className="lg:col-span-2">
                 <div className="query-block min-h-[120px]">
-                  site:linkedin.com/in/ ("Founder" OR "Owner") ("Coaching" OR "Consulting") ("burnout" OR "scale") "United States"
+                  Founders, Owners, CEOs in Coaching, Consulting dealing with burnout, scale near United States.
                 </div>
               </div>
             </div>
