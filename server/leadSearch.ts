@@ -74,8 +74,9 @@ export async function searchLinkedInProfiles(query: string, limit = 10): Promise
   url.searchParams.set("engine", "google");
   url.searchParams.set("q", query);
   // Over-fetch relative to `limit` since some raw results get filtered out
-  // for missing last names, missing companies, or dead links.
-  url.searchParams.set("num", String(Math.min(limit * 2, 20)));
+  // for missing last names, missing companies, or dead links. 100 is
+  // Google/SerpApi's practical ceiling for a single request.
+  url.searchParams.set("num", String(Math.min(limit * 2, 100)));
   url.searchParams.set("api_key", apiKey);
 
   const resp = await fetch(url.toString());

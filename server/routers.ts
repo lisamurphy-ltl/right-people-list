@@ -352,7 +352,10 @@ export const appRouter = router({
           throw new Error(`Monthly lead limit reached (${limits.leadsPerMonth}). Upgrade or buy a lead top-up to run more searches.`);
         }
 
-        const cap = Math.min(remaining, 10);
+        // One click should be able to fill the whole month's quota, not a
+        // small arbitrary batch — 100 is Google/SerpApi's practical ceiling
+        // for a single request anyway, which happens to match the Pro plan.
+        const cap = Math.min(remaining, 100);
 
         const existing = await getLeadsByUser(ctx.user.id, 1000, 0);
         const existingUrls = new Set(existing.map(l => l.linkedinUrl).filter((u): u is string => !!u));
