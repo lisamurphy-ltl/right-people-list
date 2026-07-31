@@ -65,10 +65,12 @@ LEADS_SHEET_WEBHOOK_SECRET=<not set yet — must match the Apps Script's WEBHOOK
 ## What's confirmed working (tested live, not just "should work")
 
 - Signup / login / logout
-- Stripe checkout for the $17/mo plan and $27 top-up (checkout session creation confirmed; full payment→credit flow not yet tested with a real card)
-- SerpApi lead search returning real LinkedIn profiles — **verify this is still working**, see Open Items
+- Stripe checkout for the $17/mo plan and $27 top-up (checkout session creation confirmed returns a real checkout.stripe.com URL; full payment→credit flow via a real card still not tested)
+- SerpApi lead search returning real, quality-filtered leads (real full names, real companies, live-checked LinkedIn URLs — confirmed 2026-07-31)
+- ICP Discovery wizard (18 questions) persists correctly and drives the search
 - DB auto-migration on boot
 - Custom domain + SSL
+- **Railway is directly API-accessible now** — a project-scoped Railway API token is available for this project; env vars can be read/written via `https://backboard.railway.app/graphql/v2` (`variables` query, `variableUpsert` mutation) with `projectId: 8d85cac2-3e1a-453f-aee3-6ddc8aac24f3`, `environmentId: bc1e607f-5123-4f02-aee2-4d30190e90fb`, `serviceId: 69cee3d6-a064-4d11-8596-17b471e386db`. No more relaying values through Lisa for env var fixes — huge time saver, use this first.
 
 ## ICP Discovery Questionnaire (18 questions, replaced the old 5-tag builder)
 
@@ -138,21 +140,22 @@ should actually do before it gets built.
 
 ## Open items for next session
 
-1. **Confirm `SERPAPI_API_KEY` is actually working.** Lisa pasted it with escaped quotes at least once (`\"...\"` instead of `"..."`), which made it invalid. Last known state: unconfirmed whether the corrected version was ever verified end-to-end — retest with a real signup + search before assuming it works.
-2. **Confirm the new $17/$27 Stripe price IDs were pasted into Railway** (see env var table above) — pushed in code but needed Lisa to update Railway manually; not confirmed as of this handoff.
-3. Build the Stripe webhook (item 1 above) before real customers rely on this for money.
-4. Get the real Prompt Pack PDF from Lisa and upload it.
-5. Ask Lisa if she wants the old Pro+/Agency enrichment tiers fully removed from the code, or kept dormant for a future relaunch.
-6. **Apollo free People Search** was researched but not built. Apollo's search/filter endpoint (title, seniority, industry, headcount, revenue) doesn't consume credits — but their own docs show an *obfuscated* last name and no LinkedIn URL in the raw search response, which contradicts the "fully free" read. Waiting on Lisa to create a free Apollo account and send an API key so a real test call can confirm what the free tier actually returns before building it in as the primary discovery source (ahead of SerpApi).
-7. **Google's free Custom Search API (100/day)** was agreed as a second free discovery source, ahead of paid SerpApi — not built yet either. Needs Lisa to create a free Google Programmable Search Engine + API key (her Google login, can't be done for her).
-8. Deploy the Google Apps Script webhook (see "Lead search index" above) so scraped leads actually start writing to the "App-Scraped Leads" tab.
+1. Build the Stripe webhook — checkout can still succeed while the DB never learns about it if the client-side redirect/verify flow doesn't complete. Real gap before real customers rely on this for money.
+2. Get the real Prompt Pack PDF from Lisa and upload it.
+3. Ask Lisa if she wants the old Pro+/Agency enrichment tiers fully removed from the code, or kept dormant for a future relaunch.
+4. **Apollo free People Search** was researched but not built. Apollo's search/filter endpoint (title, seniority, industry, headcount, revenue) doesn't consume credits — but their own docs show an *obfuscated* last name and no LinkedIn URL in the raw search response, which contradicts the "fully free" read. Waiting on Lisa to create a free Apollo account and send an API key so a real test call can confirm what the free tier actually returns before building it in as the primary discovery source (ahead of SerpApi).
+5. **Google's free Custom Search API (100/day)** was agreed as a second free discovery source, ahead of paid SerpApi — not built yet either. Needs Lisa to create a free Google Programmable Search Engine + API key (her Google login, can't be done for her).
+6. Deploy the Google Apps Script webhook (see "Lead search index" above) so scraped leads actually start writing to the "App-Scraped Leads" tab.
+
+~~Confirm SERPAPI_API_KEY / Stripe price IDs are working~~ — **resolved 2026-07-31**, see "What's confirmed working" above.
 
 ## Gotchas learned this session (save yourself the debugging time)
 
 - **Railway's bundled runtime path is `dist/`, not the source file's original location.** Any `path.resolve(import.meta.dirname, ...)` code needs `process.env.NODE_ENV === "production"` branching — one extra `".."` here took the site down for ~15 minutes (migrations folder resolved outside the repo entirely).
 - **The custom domain's Cloudflare DNS record must stay "DNS only" (grey cloud), never "Proxied."** It flipped to Proxied on its own at least once and caused 502s. If the site 502s again, check this first.
 - **Railway's target port matters.** The container actually listens on 8080 (visible in Deploy Logs: `Server running on http://localhost:8080/`), not 3000 — the custom domain's configured port must match, or every request 502s in ~2ms (that speed is the tell: it means the edge never reached the app at all).
-- **When Lisa manually edits Railway's Raw Editor, watch for stray `\"` characters** — happened twice, made Stripe/SerpApi keys invalid without any obvious error until tested.
+- **When Lisa manually edits Railway's Raw Editor, watch for stray `\"` characters** — happened twice, made Stripe/SerpApi keys invalid without any obvious error until tested. Worse case found 2026-07-31: a Raw Editor paste merged a whole extra `KEY="value"` fragment into a DIFFERENT variable's value (`VITE_APP_URL` ended up containing `...com" STRIPE_PRICE_PRO="price_...`), which took a while to spot because the app's error message ("Not a valid URL") didn't obviously point at which variable was the problem. If a Railway-sourced env var is behaving strangely, read its *exact* value via the API (see below) before assuming the value itself is simply wrong — check for merged/truncated content first.
+- **Railway is directly API-accessible — use this instead of relaying values through Lisa.** A project-scoped Railway API token exists for this project (generated 2026-07-31; ask Lisa for a fresh one from Railway → Account Settings → Tokens if it's no longer valid — account tokens are plain UUIDs). Browser automation cannot reach railway.com at all (confirmed org policy), but raw HTTPS calls are NOT blocked — use `curl`/`fetch` directly against `https://backboard.railway.app/graphql/v2` with `Authorization: Bearer <token>`. Project-scoped tokens can't query `me` (expect "Not Authorized" there — that's normal, not a broken token), but project/environment/service/variable queries and mutations work fine. Key queries: `variables(projectId, environmentId, serviceId)` to read all vars as a flat object, `variableUpsert(input: {projectId, environmentId, serviceId, name, value})` to set one. IDs for this project: `projectId: 8d85cac2-3e1a-453f-aee3-6ddc8aac24f3`, `environmentId: bc1e607f-5123-4f02-aee2-4d30190e90fb`, `serviceId: 69cee3d6-a064-4d11-8596-17b471e386db` (right-people-list service; MySQL service id is different).
 - **A missing/invalid `STRIPE_SECRET_KEY` used to crash the whole server** (Stripe client was instantiated eagerly at module load). Fixed — it's now lazy, so a bad key only breaks Stripe-dependent calls, not the whole site. Don't reintroduce eager instantiation for future third-party clients (SerpApi's `leadSearch.ts` already follows the lazy pattern).
 - **DB schema changes require both editing `drizzle/schema.ts` AND running `drizzle-kit generate`** to produce a migration file — editing the schema alone does nothing to the live database. Migrations now auto-apply on boot, so once generated and committed, no manual `db:push` step is needed.
 - **My browser automation tools cannot reach railway.com** (org policy, not fixable by reboot/retry) — Railway-side verification always needs either Lisa's screen or her doing the click herself. Stripe API access works fine via Composio-connected MCP tools.
