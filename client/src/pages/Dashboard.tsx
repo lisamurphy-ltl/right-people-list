@@ -32,6 +32,32 @@ const PLAN_COLOR: Record<string, string> = {
   agency:   "oklch(0.65 0.18 145)",
 };
 
+const CONTACT_RED = "oklch(0.65 0.22 25)";
+const CONTACT_GREEN = "oklch(0.65 0.18 145)";
+const CONTACT_YELLOW = "oklch(0.78 0.18 85)";
+const CONTACT_BLUE = "oklch(0.60 0.20 255)";
+
+function daysSince(value: Date | string | null | undefined): number | null {
+  if (!value) return null;
+  const d = value instanceof Date ? value : new Date(value);
+  return Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function contactRowColor(lead: { notAFit?: boolean; lastContactedAt?: Date | string | null }): string | null {
+  if (lead.notAFit) return CONTACT_RED;
+  const days = daysSince(lead.lastContactedAt);
+  if (days === null) return null;
+  if (days <= 10) return CONTACT_GREEN;
+  if (days <= 65) return CONTACT_YELLOW;
+  return CONTACT_BLUE;
+}
+
+function toDateInputValue(value: Date | string | null | undefined): string {
+  if (!value) return "";
+  const d = value instanceof Date ? value : new Date(value);
+  return d.toISOString().slice(0, 10);
+}
+
 export default function Dashboard() {
   const { user, isAuthenticated, loading } = useAuth();
   const [showAddModal, setShowAddModal] = useState(false);
@@ -64,6 +90,11 @@ export default function Dashboard() {
 
   const deleteMutation = trpc.leads.delete.useMutation({
     onSuccess: () => { refetchLeads(); refetchSub(); toast.success("Lead removed"); },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const updateStatusMutation = trpc.leads.updateStatus.useMutation({
+    onSuccess: () => refetchLeads(),
     onError: (e) => toast.error(e.message),
   });
 
@@ -307,15 +338,18 @@ export default function Dashboard() {
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ background: "oklch(0.18 0.012 260)", borderBottom: "1px solid oklch(0.26 0.012 260)" }}>
-                    {["Name & Title","Company","Contact","Score","Status","Actions"].map(h => (
+                    {["Name & Title","Company","Contact","Score","Last Contact","Status","Actions"].map(h => (
                       <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest"
                         style={{ color: "oklch(0.50 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {leadsData.items.map((lead, i) => (
-                    <tr key={lead.id} style={{ background: i % 2 === 0 ? "oklch(0.15 0.012 260)" : "oklch(0.17 0.012 260)", borderBottom: "1px solid oklch(0.22 0.012 260)" }}>
+                  {leadsData.items.map((lead, i) => {
+                    const rowColor = contactRowColor(lead);
+                    const isContacted = !!lead.lastContactedAt;
+                    return (
+                    <tr key={lead.id} style={{ background: rowColor ? `${rowColor} / 0.14` : (i % 2 === 0 ? "oklch(0.15 0.012 260)" : "oklch(0.17 0.012 260)"), borderBottom: "1px solid oklch(0.22 0.012 260)" }}>
                       <td className="px-4 py-3">
                         <div className="font-semibold" style={{ color: "oklch(0.92 0.005 260)" }}>{lead.fullName ?? "—"}</div>
                         <div className="text-xs mt-0.5" style={{ color: "oklch(0.55 0.008 260)" }}>{lead.title ?? ""}</div>
@@ -361,6 +395,39 @@ export default function Dashboard() {
                         </span>
                       </td>
                       <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={isContacted}
+                            onChange={() => updateStatusMutation.mutate({
+                              leadId: lead.id,
+                              lastContactedAt: isContacted ? null : new Date().toISOString().slice(0, 10),
+                            })}
+                            className="w-4 h-4 rounded cursor-pointer"
+                            style={{ accentColor: CONTACT_GREEN }}
+                          />
+                          <input
+                            type="date"
+                            value={toDateInputValue(lead.lastContactedAt)}
+                            onChange={(e) => updateStatusMutation.mutate({ leadId: lead.id, lastContactedAt: e.target.value || null })}
+                            disabled={!isContacted}
+                            className="px-1.5 py-0.5 rounded text-xs"
+                            style={{ background: "oklch(0.14 0.012 260)", border: "1px solid oklch(0.28 0.012 260)", color: "oklch(0.75 0.008 260)", colorScheme: "dark" }}
+                          />
+                        </div>
+                        <button
+                          onClick={() => updateStatusMutation.mutate({ leadId: lead.id, notAFit: !lead.notAFit })}
+                          className="mt-1.5 px-2 py-0.5 rounded-full text-xs font-semibold"
+                          style={{
+                            background: lead.notAFit ? "oklch(0.65 0.22 25 / 0.18)" : "oklch(0.22 0.012 260)",
+                            color: lead.notAFit ? CONTACT_RED : "oklch(0.50 0.008 260)",
+                            border: `1px solid ${lead.notAFit ? "oklch(0.65 0.22 25 / 0.5)" : "oklch(0.30 0.012 260)"}`,
+                          }}
+                        >
+                          Not a Fit
+                        </button>
+                      </td>
+                      <td className="px-4 py-3">
                         <span className="text-xs capitalize" style={{ color: lead.enrichmentStatus === "enriched" ? "oklch(0.65 0.18 145)" : "oklch(0.50 0.008 260)" }}>
                           {lead.enrichmentStatus?.replace("_", " ") ?? "—"}
                         </span>
@@ -388,7 +455,8 @@ export default function Dashboard() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

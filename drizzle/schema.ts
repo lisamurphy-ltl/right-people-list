@@ -66,6 +66,9 @@ export const leads = mysqlTable("leads", {
   searchQuery: text("searchQuery"),
   enrichmentStatus: mysqlEnum("enrichmentStatus", ["pending", "enriched", "failed", "not_enriched"]).default("not_enriched").notNull(),
   apolloEnriched: boolean("apolloEnriched").default(false).notNull(),
+  // Outreach tracking
+  lastContactedAt: timestamp("lastContactedAt"),
+  notAFit: boolean("notAFit").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

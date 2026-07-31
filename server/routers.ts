@@ -476,6 +476,26 @@ export const appRouter = router({
         return lead;
       }),
 
+    updateStatus: protectedProcedure
+      .input(z.object({
+        leadId: z.number(),
+        lastContactedAt: z.string().nullable().optional(),
+        notAFit: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const lead = await getLeadById(input.leadId, ctx.user.id);
+        if (!lead) throw new Error("Lead not found");
+
+        const updates: Partial<{ lastContactedAt: Date | null; notAFit: boolean }> = {};
+        if (input.lastContactedAt !== undefined) {
+          updates.lastContactedAt = input.lastContactedAt ? new Date(input.lastContactedAt) : null;
+        }
+        if (input.notAFit !== undefined) updates.notAFit = input.notAFit;
+
+        await updateLead(input.leadId, ctx.user.id, updates);
+        return getLeadById(input.leadId, ctx.user.id);
+      }),
+
     enrich: protectedProcedure
       .input(z.object({ leadId: z.number() }))
       .mutation(async ({ ctx, input }) => {
