@@ -1,4 +1,4 @@
-import { and, eq, like, or } from "drizzle-orm";
+import { and, eq, isNotNull, like, ne, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { enrichmentJobs, icpProfiles, InsertEnrichmentJob, InsertLead, InsertScrapedLeadIndexRow, InsertSubscription, leads, scrapedLeadsIndex, subscriptions, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -200,20 +200,29 @@ export async function findIndexedCandidates(params: {
   const db = await getDb();
   if (!db || params.limit <= 0) return [];
 
-  const conditions = [];
+  // A cached row without a company is a pre-quality-filter leftover (or a
+  // gap) — never serve it, same bar as a fresh SerpApi result has to clear.
+  const conditions = [isNotNull(scrapedLeadsIndex.company), ne(scrapedLeadsIndex.company, "")];
   if (params.industries.length > 0) {
-    conditions.push(or(...params.industries.map(i => like(scrapedLeadsIndex.industry, `%${i}%`))));
+    conditions.push(or(...params.industries.map(i => like(scrapedLeadsIndex.industry, `%${i}%`)))!);
   }
   if (params.location) {
     conditions.push(like(scrapedLeadsIndex.location, `%${params.location}%`));
   }
 
   const rows = await db.select().from(scrapedLeadsIndex)
-    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .where(and(...conditions))
     .limit(params.limit + params.excludeUrls.length);
 
   const excludeSet = new Set(params.excludeUrls);
-  return rows.filter(r => !excludeSet.has(r.linkedinUrl)).slice(0, params.limit);
+  const hasFullName = (name: string) => {
+    const words = name.trim().split(/\s+/);
+    if (words.length < 2) return false;
+    return words[words.length - 1].replace(/\.$/, "").length > 1;
+  };
+  return rows
+    .filter(r => !excludeSet.has(r.linkedinUrl) && hasFullName(r.fullName))
+    .slice(0, params.limit);
 }
 
 export async function upsertIndexedCandidates(rows: InsertScrapedLeadIndexRow[]) {
