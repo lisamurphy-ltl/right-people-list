@@ -67,6 +67,11 @@ export default function Dashboard() {
     onError: (e) => toast.error(e.message),
   });
 
+  const clearAllMutation = trpc.leads.clearAll.useMutation({
+    onSuccess: () => { refetchLeads(); refetchSub(); toast.success("All leads cleared and monthly usage reset."); },
+    onError: (e) => toast.error(e.message),
+  });
+
   const checkoutMutation = trpc.subscription.createCheckout.useMutation({
     onSuccess: (data) => { if (data.url) window.location.href = data.url; },
     onError: (e) => toast.error(e.message),
@@ -259,6 +264,19 @@ export default function Dashboard() {
               style={{ background: "oklch(0.22 0.012 260)", color: "oklch(0.68 0.008 260)", border: "1px solid oklch(0.30 0.012 260)" }}>
               <Download size={14} /> Export CSV
             </button>
+            {leadsData?.items && leadsData.items.length > 0 && (
+              <button
+                onClick={() => {
+                  if (window.confirm("Delete all leads and reset this month's usage? This can't be undone.")) {
+                    clearAllMutation.mutate();
+                  }
+                }}
+                disabled={clearAllMutation.isPending}
+                className="flex items-center gap-2 px-4 py-2 rounded text-sm font-semibold transition-all"
+                style={{ background: "oklch(0.22 0.012 260)", color: "oklch(0.65 0.22 25)", border: "1px solid oklch(0.65 0.22 25 / 0.4)" }}>
+                {clearAllMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />} Clear All
+              </button>
+            )}
             <PaywallGate sub={sub} isAuthenticated={isAuthenticated} onAllowed={() => setShowAddModal(true)}>
               <button className="flex items-center gap-2 px-4 py-2 rounded text-sm font-bold transition-all"
                 style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>

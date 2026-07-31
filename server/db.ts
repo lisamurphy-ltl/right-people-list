@@ -187,6 +187,12 @@ export async function getLeadsCount(userId: number) {
   return result.length;
 }
 
+export async function deleteAllLeads(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(leads).where(eq(leads.userId, userId));
+}
+
 // ── Scraped Lead Index ───────────────────────────────────────────────────────
 // Shared cache of every profile SerpApi has ever returned, so a new search
 // with overlapping ICP criteria can be served without another SerpApi call.

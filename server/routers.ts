@@ -11,6 +11,7 @@ import {
   addBonusLeadsOnce,
   createLead,
   createUser,
+  deleteAllLeads,
   findIndexedCandidates,
   getIcpProfile,
   getLeadById,
@@ -526,6 +527,14 @@ export const appRouter = router({
         await db.delete(leadsTable).where(and(eq(leadsTable.id, input.leadId), eq(leadsTable.userId, ctx.user.id)));
         return { success: true };
       }),
+
+    clearAll: protectedProcedure.mutation(async ({ ctx }) => {
+      await deleteAllLeads(ctx.user.id);
+      // Also reset the monthly counter so clearing test leads actually frees
+      // up quota to run a fresh test, not just tidies the list.
+      await updateSubscription(ctx.user.id, { leadsUsed: 0 });
+      return { success: true };
+    }),
   }),
 
   icpProfile: router({
