@@ -138,6 +138,25 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Just came back from a subscription checkout — the Stripe webhook is the
+  // source of truth for the actual upgrade, but it can take a few seconds to
+  // land, so poll briefly instead of leaving the user staring at "Free".
+  const upgradedPollRef = useRef(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("upgraded") === "1" && !upgradedPollRef.current) {
+      upgradedPollRef.current = true;
+      window.history.replaceState({}, "", "/dashboard");
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        refetchSub();
+        if (attempts >= 6) clearInterval(interval);
+      }, 2000);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const exportCSV = useCallback(() => {
     if (!leadsData?.items?.length) return;
     const headers = ["Name","Title","Company","LinkedIn URL","Email (Unverified)","Email (Verified)","Phone","Location","Score","Enrichment Status"];
