@@ -6,6 +6,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { runMigrations } from "./migrate";
+import { handleStripeWebhook } from "../stripeWebhook";
 import { serveStatic, setupVite } from "./vite";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -32,6 +33,10 @@ async function startServer() {
 
   const app = express();
   const server = createServer(app);
+  // Stripe needs the raw, unparsed body to verify webhook signatures — must
+  // be registered before the JSON body parser below, which would otherwise
+  // consume and transform the body first.
+  app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));

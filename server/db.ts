@@ -85,6 +85,13 @@ export async function getOrCreateSubscription(userId: number) {
   return created[0];
 }
 
+export async function getSubscriptionByStripeCustomerId(stripeCustomerId: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(subscriptions).where(eq(subscriptions.stripeCustomerId, stripeCustomerId)).limit(1);
+  return result[0] ?? null;
+}
+
 export async function updateSubscription(userId: number, data: Partial<InsertSubscription>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
