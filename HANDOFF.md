@@ -132,11 +132,16 @@ should actually do before it gets built.
 
 ## What's NOT built yet (be honest with Lisa about these if asked)
 
-1. **No Stripe webhook.** When someone pays, checkout succeeds but nothing tells the database "this person is now Pro" except the client-side redirect flow (`?upgraded=1` / `?topup_session=`). If a customer closes the tab before the redirect completes, they'll have paid but not be upgraded. A webhook handler for `checkout.session.completed` / `customer.subscription.updated` is the real fix — flagged repeatedly this session, never built.
-2. **No email verification / password reset flow.** Signup just takes an email at face value.
-3. **The $49 Prompt Pack PDF file doesn't exist.** `server/routers.ts` points at `/downloads/right-people-list-outreach-system.pdf`, which isn't in the repo. Anyone who buys it will hit a 404. Needs the real file dropped in `client/public/downloads/`.
-4. **No hero photo** — Home.tsx uses a CSS starfield/gradient instead of a real image. Fine as a design choice, but originally a placeholder.
-5. **Apollo enrichment (verified email/phone)** code still exists (`server/enrichment.ts`, Pro+/Agency plan logic) but isn't sold or reachable from the current UI. Dead code, not wired to anything a user can click.
+1. **No email verification / password reset flow.** Signup just takes an email at face value.
+2. **The $49 Prompt Pack PDF file doesn't exist.** `server/routers.ts` points at `/downloads/right-people-list-outreach-system.pdf`, which isn't in the repo. Anyone who buys it will hit a 404. Needs the real file dropped in `client/public/downloads/`.
+3. **No hero photo** — Home.tsx uses a CSS starfield/gradient instead of a real image. Fine as a design choice, but originally a placeholder.
+4. **Apollo enrichment (verified email/phone)** code still exists (`server/enrichment.ts`, Pro+/Agency plan logic) but isn't sold or reachable from the current UI. Dead code, not wired to anything a user can click.
+
+## Stripe webhook (built 2026-08-01)
+
+`server/stripeWebhook.ts`, registered at `POST /api/stripe/webhook` in `server/_core/index.ts` **before** the global `express.json()` parser (needs the raw body for signature verification). Handles `checkout.session.completed` (subscription mode — upgrades the plan), `customer.subscription.updated`, and `customer.subscription.deleted` (downgrades to free). `STRIPE_WEBHOOK_SECRET` is set on Railway; the endpoint is registered in Stripe (`we_1TzLMhLeweUh8LMa8mmC7ZdP`).
+
+**Why this got built:** a real customer (Lisa, testing with her own card) paid for Pro and the dashboard kept showing Free — the success redirect only ever had a verify step for the one-time top-up (`?topup_session=`), never for subscription checkouts (`?upgraded=1` did nothing). Her account was manually corrected directly in MySQL once the real Stripe subscription was confirmed server-side; the webhook is the permanent fix so this can't happen to a real customer again. Dashboard also now briefly polls `subscription.get` after an `?upgraded=1` redirect so the UI updates within seconds instead of requiring a manual refresh.
 
 ## Open items for next session
 
