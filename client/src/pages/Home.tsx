@@ -384,23 +384,23 @@ export default function Home() {
               },
               {
                 num: "02", name: "Client Engine Builder", tag: "Available now",
-                tagColor: "oklch(0.60 0.20 255)", tagBg: "oklch(0.60 0.20 255 / 0.10)",
+                tagColor: "oklch(0.66 0.20 255)", tagBg: "oklch(0.60 0.20 255 / 0.10)",
                 desc: "Define your ICP architecture, nail your positioning, and build the messaging framework that makes your outreach land. The strategy layer that makes The Right-People List 10x more effective.",
               },
               {
                 num: "03", name: "Funnel Builder", tag: "Coming soon",
-                tagColor: "oklch(0.55 0.008 260)", tagBg: "oklch(0.22 0.012 260)",
+                tagColor: "oklch(0.68 0.008 260)", tagBg: "oklch(0.22 0.012 260)",
                 desc: "Convert the leads you find into booked calls and paying clients. Automated follow-up sequences, landing pages, and conversion architecture — built for service-based businesses.",
               },
             ].map((tool) => (
               <div key={tool.num} className="p-6 rounded-xl relative"
                 style={{ background: "oklch(0.16 0.012 260)", border: "1px solid oklch(0.24 0.012 260)" }}>
                 <div className="flex items-start justify-between mb-4">
-                  <span style={{ fontFamily: "Archivo, sans-serif", fontWeight: 900, fontSize: "2rem", color: "oklch(0.28 0.012 260)", lineHeight: 1 }}>{tool.num}</span>
+                  <span aria-hidden="true" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 900, fontSize: "2rem", color: "oklch(0.46 0.012 260)", lineHeight: 1 }}>{tool.num}</span>
                   <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: tool.tagBg, color: tool.tagColor, fontFamily: "Archivo, sans-serif" }}>{tool.tag}</span>
                 </div>
                 <h3 className="mb-2" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.05rem", color: "oklch(0.92 0.005 260)" }}>{tool.name}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "oklch(0.55 0.008 260)" }}>{tool.desc}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "oklch(0.64 0.008 260)" }}>{tool.desc}</p>
               </div>
             ))}
           </div>
