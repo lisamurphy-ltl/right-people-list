@@ -47,7 +47,6 @@ export default function Login() {
     border: "1px solid oklch(0.30 0.012 260)",
     color: "oklch(0.92 0.005 260)",
     fontSize: "0.95rem",
-    outline: "none",
   };
 
   return (
@@ -65,32 +64,44 @@ export default function Login() {
           </h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
           {mode === "signup" && (
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+              <label htmlFor="login-name" className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
                 Name
               </label>
-              <input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
+              <input id="login-name" name="name" autoComplete="name" style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+            <label htmlFor="login-email" className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
               Email
             </label>
-            <input style={inputStyle} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" />
+            <input id="login-email" name="email" autoComplete="email" style={inputStyle} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+            <label htmlFor="login-password" className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
               Password
             </label>
-            <input style={inputStyle} type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+            <input
+              id="login-password"
+              name="password"
+              autoComplete={mode === "login" ? "current-password" : "new-password"}
+              style={inputStyle}
+              type="password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              aria-describedby={error ? "login-error" : undefined}
+            />
           </div>
 
           {error && (
-            <p className="text-sm" style={{ color: "oklch(0.65 0.20 25)" }}>{error}</p>
+            <p id="login-error" role="alert" className="text-sm" style={{ color: "oklch(0.65 0.20 25)" }}>{error}</p>
           )}
 
           <button

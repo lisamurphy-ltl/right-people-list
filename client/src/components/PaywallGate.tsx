@@ -17,6 +17,7 @@ import { Lock, Zap, LogIn, X } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 interface SubData {
   plan: string;
@@ -47,6 +48,7 @@ const PLAN_LABEL: Record<string, string> = {
 
 export default function PaywallGate({ sub, isAuthenticated, children, onAllowed }: Props) {
   const [showModal, setShowModal] = useState(false);
+  const dialogRef = useFocusTrap(showModal, () => setShowModal(false));
 
   const checkoutMutation = trpc.subscription.createCheckout.useMutation({
     onSuccess: (data) => { if (data.url) window.location.href = data.url; },
@@ -77,21 +79,24 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "oklch(0 0 0 / 0.75)", backdropFilter: "blur(4px)" }}>
-          <div className="w-full max-w-md rounded-2xl overflow-hidden"
-            style={{ background: "oklch(0.17 0.012 260)", border: "1px solid oklch(0.28 0.012 260)", boxShadow: "0 25px 60px oklch(0 0 0 / 0.5)" }}>
+          style={{ background: "oklch(0 0 0 / 0.75)", backdropFilter: "blur(4px)" }}
+          onClick={() => setShowModal(false)}>
+          <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="paywall-modal-title"
+            className="w-full max-w-md rounded-2xl overflow-hidden"
+            style={{ background: "oklch(0.17 0.012 260)", border: "1px solid oklch(0.28 0.012 260)", boxShadow: "0 25px 60px oklch(0 0 0 / 0.5)" }}
+            onClick={(e) => e.stopPropagation()}>
 
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4"
               style={{ borderBottom: "1px solid oklch(0.24 0.012 260)" }}>
               <div className="flex items-center gap-2">
-                <Lock size={16} style={{ color: "oklch(0.78 0.18 85)" }} />
-                <span style={{ fontFamily: "Archivo, sans-serif", fontWeight: 700, color: "oklch(0.92 0.005 260)" }}>
+                <Lock size={16} style={{ color: "oklch(0.78 0.18 85)" }} aria-hidden="true" />
+                <span id="paywall-modal-title" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 700, color: "oklch(0.92 0.005 260)" }}>
                   {!isAuthenticated ? "Sign in to continue" : "Monthly limit reached"}
                 </span>
               </div>
-              <button onClick={() => setShowModal(false)} style={{ color: "oklch(0.45 0.008 260)" }}>
-                <X size={18} />
+              <button onClick={() => setShowModal(false)} aria-label="Close" style={{ color: "oklch(0.45 0.008 260)" }}>
+                <X size={18} aria-hidden="true" />
               </button>
             </div>
 
@@ -116,7 +121,7 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
                   <a href={getLoginUrl()}
                     className="flex items-center justify-center gap-2 w-full py-3 rounded font-bold text-sm"
                     style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", textDecoration: "none" }}>
-                    <LogIn size={15} /> Sign In — It's Free
+                    <LogIn size={15} aria-hidden="true" /> Sign In — It's Free
                   </a>
                 </>
               ) : (
@@ -144,7 +149,7 @@ export default function PaywallGate({ sub, isAuthenticated, children, onAllowed 
                     disabled={topUpMutation.isPending}
                     className="flex items-center justify-center gap-2 w-full py-3 rounded font-bold text-sm mb-2"
                     style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
-                    <Zap size={15} /> Buy 100 Leads — $27
+                    <Zap size={15} aria-hidden="true" /> Buy 100 Leads — $27
                   </button>
 
                   {sub?.plan === "free" && (

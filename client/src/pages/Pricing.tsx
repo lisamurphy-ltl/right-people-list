@@ -56,14 +56,14 @@ function FeatureList({ features, locked }: { features: string[]; locked: string[
     <div className="flex-1 mb-6 space-y-2">
       {features.map(f => (
         <div key={f} className="flex items-start gap-2 text-sm min-w-0">
-          <Check size={14} style={{ color: "oklch(0.65 0.18 145)", marginTop: "2px", flexShrink: 0 }} />
+          <Check size={14} style={{ color: "oklch(0.65 0.18 145)", marginTop: "2px", flexShrink: 0 }} aria-hidden="true" />
           <span style={{ color: "oklch(0.75 0.008 260)" }}>{f}</span>
         </div>
       ))}
       {locked.map(f => (
         <div key={f} className="flex items-start gap-2 text-sm">
-          <span style={{ color: "oklch(0.48 0.010 260)", marginTop: "2px", flexShrink: 0, fontSize: "0.85rem" }}>✕</span>
-          <span style={{ color: "oklch(0.52 0.008 260)" }}>{f}</span>
+          <span aria-hidden="true" style={{ color: "oklch(0.48 0.010 260)", marginTop: "2px", flexShrink: 0, fontSize: "0.85rem" }}>✕</span>
+          <span style={{ color: "oklch(0.52 0.008 260)" }}><span className="sr-only">Not included: </span>{f}</span>
         </div>
       ))}
     </div>
@@ -104,6 +104,7 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen" style={{ background: "oklch(0.13 0.012 260)" }}>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
         style={{ background: "oklch(0.13 0.012 260 / 0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid oklch(0.22 0.012 260)" }}>
@@ -116,7 +117,7 @@ export default function Pricing() {
         </a>
       </nav>
 
-      <div className="pt-28 pb-20 container">
+      <main id="main-content" className="pt-28 pb-20 container">
         <div className="text-center mb-14">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>Pricing</p>
           <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
@@ -152,9 +153,10 @@ export default function Pricing() {
               Most Popular
             </div>
 
-            <div className="mb-4 flex gap-1.5 p-1 rounded-lg" style={{ background: "oklch(0.14 0.012 260)" }}>
+            <div className="mb-4 flex gap-1.5 p-1 rounded-lg" style={{ background: "oklch(0.14 0.012 260)" }} role="radiogroup" aria-label="Paid plan option">
               {PAID_OPTIONS.map(t => (
                 <button key={t.key} onClick={() => setSelectedPaid(t.key)}
+                  role="radio" aria-checked={selectedPaid === t.key}
                   className="flex-1 py-1.5 rounded-md text-xs font-bold transition-all"
                   style={{
                     background: selectedPaid === t.key ? "oklch(0.78 0.18 85)" : "transparent",
@@ -200,7 +202,7 @@ export default function Pricing() {
               <div className="space-y-2">
                 {["Article Finder Prompt", "Link Verifier Prompt", "3-Touch Email Drip Prompt", "Step-by-step guide"].map(f => (
                   <div key={f} className="flex items-start gap-2 text-sm min-w-0">
-                    <Check size={14} style={{ color: "oklch(0.65 0.18 145)", marginTop: "2px", flexShrink: 0 }} />
+                    <Check size={14} style={{ color: "oklch(0.65 0.18 145)", marginTop: "2px", flexShrink: 0 }} aria-hidden="true" />
                     <span style={{ color: "oklch(0.75 0.008 260)" }}>{f}</span>
                   </div>
                 ))}
@@ -222,13 +224,13 @@ export default function Pricing() {
         {/* Legal compliance note */}
         <div className="mt-12 p-5 rounded-lg max-w-2xl mx-auto" style={{ background: "oklch(0.60 0.20 255 / 0.06)", border: "1px solid oklch(0.60 0.20 255 / 0.20)" }}>
           <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.60 0.20 255)", fontFamily: "Archivo, sans-serif" }}>
-            <Zap size={11} style={{ display: "inline", marginRight: "4px" }} />Legal & Ethical Use
+            <Zap size={11} aria-hidden="true" style={{ display: "inline", marginRight: "4px" }} />Legal & Ethical Use
           </p>
           <p className="text-sm leading-relaxed break-words" style={{ color: "oklch(0.58 0.008 260)" }}>
             The Right-People List surfaces <strong style={{ color: "oklch(0.75 0.008 260)" }}>publicly available data only</strong> — profiles visible to anyone on the open internet. Scraping public data is legal in the US under the hiQ v. LinkedIn ruling (9th Circuit, 2022). Email enrichment via Apollo uses their licensed B2B database. All outreach must comply with CAN-SPAM: include a physical address, provide an unsubscribe option, and honor opt-outs within 10 business days. GDPR applies to EU contacts — The Right-People List targets US-based prospects by default.
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

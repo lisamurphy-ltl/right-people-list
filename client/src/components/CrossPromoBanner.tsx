@@ -73,11 +73,11 @@ export default function CrossPromoBanner() {
   if (dismissed) return null;
 
   return (
-    <div className="mb-6 p-4 rounded-lg flex items-center justify-between gap-4 flex-wrap"
+    <div role="region" aria-label="Promotion" className="mb-6 p-4 rounded-lg flex items-center justify-between gap-4 flex-wrap"
       style={{ background: "oklch(0.60 0.20 255 / 0.08)", border: "1px solid oklch(0.60 0.20 255 / 0.25)" }}>
       <div className="flex items-center gap-3">
         <div className="p-2 rounded-full shrink-0" style={{ background: "oklch(0.60 0.20 255 / 0.15)" }}>
-          <Sparkles size={16} style={{ color: "oklch(0.60 0.20 255)" }} />
+          <Sparkles size={16} style={{ color: "oklch(0.60 0.20 255)" }} aria-hidden="true" />
         </div>
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest mb-0.5"
@@ -89,7 +89,7 @@ export default function CrossPromoBanner() {
         <a href={promo.url} target="_blank" rel="noopener noreferrer"
           className="flex items-center gap-1.5 px-4 py-2 rounded text-sm font-bold whitespace-nowrap"
           style={{ background: "oklch(0.60 0.20 255)", color: "oklch(0.98 0.005 260)", fontFamily: "Archivo, sans-serif", textDecoration: "none" }}>
-          {promo.cta} <ArrowRight size={14} />
+          {promo.cta} <ArrowRight size={14} aria-hidden="true" /><span className="sr-only"> (opens in new tab)</span>
         </a>
         <button
           onClick={() => {
@@ -98,8 +98,8 @@ export default function CrossPromoBanner() {
           }}
           className="p-2 rounded"
           style={{ color: "oklch(0.50 0.010 260)" }}
-          aria-label="Dismiss">
-          <X size={14} />
+          aria-label="Dismiss this promotion">
+          <X size={14} aria-hidden="true" />
         </button>
       </div>
     </div>

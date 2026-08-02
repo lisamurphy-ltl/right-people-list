@@ -58,6 +58,17 @@ function toDateInputValue(value: Date | string | null | undefined): string {
   return d.toISOString().slice(0, 10);
 }
 
+// Text equivalent of the row color, so freshness/fit status is never
+// conveyed by color alone (WCAG 1.4.1).
+function contactStatusLabel(lead: { notAFit?: boolean; lastContactedAt?: Date | string | null }): string | null {
+  if (lead.notAFit) return "Not a fit";
+  const days = daysSince(lead.lastContactedAt);
+  if (days === null) return null;
+  if (days <= 10) return "Recently contacted";
+  if (days <= 65) return "Follow up soon";
+  return "Overdue for follow-up";
+}
+
 export default function Dashboard() {
   const { user, isAuthenticated, loading } = useAuth();
   const [showAddModal, setShowAddModal] = useState(false);
@@ -181,16 +192,17 @@ export default function Dashboard() {
   }, [leadsData]);
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: "oklch(0.13 0.012 260)" }}>
-      <Loader2 className="animate-spin" style={{ color: "oklch(0.78 0.18 85)" }} size={32} />
+    <div className="min-h-screen flex items-center justify-center" style={{ background: "oklch(0.13 0.012 260)" }} role="status" aria-live="polite">
+      <Loader2 className="animate-spin" style={{ color: "oklch(0.78 0.18 85)" }} size={32} aria-hidden="true" />
+      <span className="sr-only">Loading dashboard…</span>
     </div>
   );
 
   if (!isAuthenticated) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-6" style={{ background: "oklch(0.13 0.012 260)" }}>
-      <h2 style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.8rem", color: "oklch(0.95 0.005 260)" }}>
+      <h1 style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.8rem", color: "oklch(0.95 0.005 260)" }}>
         Sign in to access your dashboard
-      </h2>
+      </h1>
       <a href={getLoginUrl()} style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", fontWeight: 700, padding: "0.875rem 2rem", borderRadius: "0.375rem", textDecoration: "none" }}>
         Sign In
       </a>
@@ -209,21 +221,22 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen" style={{ background: "oklch(0.13 0.012 260)" }}>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
+      <nav aria-label="Main" className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
         style={{ background: "oklch(0.13 0.012 260 / 0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid oklch(0.22 0.012 260)" }}>
         <a href="/" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.1rem", color: "oklch(0.92 0.005 260)", textDecoration: "none", letterSpacing: "-0.02em" }}>
           The <span className="text-chrome-gold">Right-People List</span>
         </a>
         <div className="flex items-center gap-3">
           <span className="text-sm px-3 py-1 rounded-full" style={{ background: "oklch(0.20 0.012 260)", color: PLAN_COLOR[plan], border: `1px solid ${PLAN_COLOR[plan]}40`, fontFamily: "Archivo, sans-serif", fontWeight: 700 }}>
-            {PLAN_LABEL[plan]}
+            <span className="sr-only">Current plan: </span>{PLAN_LABEL[plan]}
           </span>
           <span className="text-sm" style={{ color: "oklch(0.60 0.008 260)" }}>{user?.name}</span>
         </div>
       </nav>
 
-      <div className="pt-20 container py-8">
+      <main id="main-content" className="pt-20 container py-8">
         <CrossPromoBanner />
 
         {!icpProfile || !isProfileReady(icpProfile.answers ?? {}) || editingIcp ? (
@@ -338,7 +351,10 @@ export default function Dashboard() {
 
         {/* Leads Table */}
         {leadsLoading ? (
-          <div className="flex items-center justify-center py-20"><Loader2 className="animate-spin" style={{ color: "oklch(0.78 0.18 85)" }} size={28} /></div>
+          <div className="flex items-center justify-center py-20" role="status" aria-live="polite">
+            <Loader2 className="animate-spin" style={{ color: "oklch(0.78 0.18 85)" }} size={28} aria-hidden="true" />
+            <span className="sr-only">Loading your leads…</span>
+          </div>
         ) : !leadsData?.items?.length ? (
           <div className="text-center py-20 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
             <Users size={40} style={{ color: "oklch(0.35 0.012 260)", margin: "0 auto 1rem" }} />
@@ -358,7 +374,7 @@ export default function Dashboard() {
                 <thead>
                   <tr style={{ background: "oklch(0.18 0.012 260)", borderBottom: "1px solid oklch(0.26 0.012 260)" }}>
                     {["Name & Title","Company","Contact","Score","Last Contact","Status","Actions"].map(h => (
-                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest"
+                      <th key={h} scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest"
                         style={{ color: "oklch(0.50 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{h}</th>
                     ))}
                   </tr>
@@ -366,18 +382,19 @@ export default function Dashboard() {
                 <tbody>
                   {leadsData.items.map((lead, i) => {
                     const rowColor = contactRowColor(lead);
+                    const statusLabel = contactStatusLabel(lead);
                     const isContacted = !!lead.lastContactedAt;
                     return (
                     <tr key={lead.id} style={{ background: rowColor ? `${rowColor} / 0.14` : (i % 2 === 0 ? "oklch(0.15 0.012 260)" : "oklch(0.17 0.012 260)"), borderBottom: "1px solid oklch(0.22 0.012 260)" }}>
-                      <td className="px-4 py-3">
+                      <th scope="row" className="px-4 py-3 text-left font-normal">
                         <div className="font-semibold" style={{ color: "oklch(0.92 0.005 260)" }}>{lead.fullName ?? "—"}</div>
                         <div className="text-xs mt-0.5" style={{ color: "oklch(0.55 0.008 260)" }}>{lead.title ?? ""}</div>
                         {lead.linkedinUrl && (
                           <a href={lead.linkedinUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs mt-1" style={{ color: "oklch(0.60 0.20 255)" }}>
-                            LinkedIn <ExternalLink size={10} />
+                            LinkedIn <ExternalLink size={10} aria-hidden="true" /><span className="sr-only"> (opens in new tab)</span>
                           </a>
                         )}
-                      </td>
+                      </th>
                       <td className="px-4 py-3">
                         <div style={{ color: "oklch(0.75 0.008 260)" }}>{lead.company ?? "—"}</div>
                         {lead.companyDomain && <div className="text-xs" style={{ color: "oklch(0.45 0.008 260)" }}>{lead.companyDomain}</div>}
@@ -422,6 +439,7 @@ export default function Dashboard() {
                               leadId: lead.id,
                               lastContactedAt: isContacted ? null : new Date().toISOString().slice(0, 10),
                             })}
+                            aria-label={isContacted ? `Mark ${lead.fullName ?? "this lead"} as not contacted` : `Mark ${lead.fullName ?? "this lead"} as contacted today`}
                             className="w-4 h-4 rounded cursor-pointer"
                             style={{ accentColor: CONTACT_GREEN }}
                           />
@@ -430,12 +448,20 @@ export default function Dashboard() {
                             value={toDateInputValue(lead.lastContactedAt)}
                             onChange={(e) => updateStatusMutation.mutate({ leadId: lead.id, lastContactedAt: e.target.value || null })}
                             disabled={!isContacted}
+                            aria-label={`Last contacted date for ${lead.fullName ?? "this lead"}`}
                             className="px-1.5 py-0.5 rounded text-xs"
                             style={{ background: "oklch(0.14 0.012 260)", border: "1px solid oklch(0.28 0.012 260)", color: "oklch(0.75 0.008 260)", colorScheme: "dark" }}
                           />
                         </div>
+                        {statusLabel && (
+                          <div className="mt-1 text-xs font-semibold" style={{ color: rowColor ?? "oklch(0.50 0.008 260)" }}>
+                            {statusLabel}
+                          </div>
+                        )}
                         <button
                           onClick={() => updateStatusMutation.mutate({ leadId: lead.id, notAFit: !lead.notAFit })}
+                          aria-pressed={!!lead.notAFit}
+                          aria-label={lead.notAFit ? `Unmark ${lead.fullName ?? "this lead"} as not a fit` : `Mark ${lead.fullName ?? "this lead"} as not a fit`}
                           className="mt-1.5 px-2 py-0.5 rounded-full text-xs font-semibold"
                           style={{
                             background: lead.notAFit ? "oklch(0.65 0.22 25 / 0.18)" : "oklch(0.22 0.012 260)",
@@ -460,16 +486,18 @@ export default function Dashboard() {
                               className="flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold transition-all"
                               style={{ background: "oklch(0.78 0.18 85 / 0.15)", color: "oklch(0.78 0.18 85)", border: "1px solid oklch(0.78 0.18 85 / 0.3)" }}
                             >
-                              {enrichMutation.isPending ? <Loader2 size={10} className="animate-spin" /> : <Zap size={10} />}
+                              {enrichMutation.isPending ? <Loader2 size={10} className="animate-spin" aria-hidden="true" /> : <Zap size={10} aria-hidden="true" />}
                               Enrich
+                              <span className="sr-only"> {lead.fullName ?? "this lead"}</span>
                             </button>
                           )}
                           <button
                             onClick={() => deleteMutation.mutate({ leadId: lead.id })}
+                            aria-label={`Delete ${lead.fullName ?? "this lead"}`}
                             className="p-1 rounded transition-all"
                             style={{ color: "oklch(0.45 0.008 260)" }}
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={14} aria-hidden="true" />
                           </button>
                         </div>
                       </td>
@@ -507,7 +535,7 @@ export default function Dashboard() {
             </div>
           </div>
         )}
-      </div>
+      </main>
 
       {showAddModal && (
         <AddLeadModal

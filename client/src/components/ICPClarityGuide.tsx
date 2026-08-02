@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X, ChevronRight, ChevronLeft, Lightbulb, Target, Users, ArrowRight } from "lucide-react";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 interface Props {
   onClose: () => void;
@@ -59,18 +60,22 @@ export default function ICPClarityGuide({ onClose }: Props) {
   const current = STEPS[step];
   const isLast = step === STEPS.length - 1;
   const canNext = current.field ? answers[current.field]?.trim().length > 10 : true;
+  const dialogRef = useFocusTrap(true, onClose);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "oklch(0 0 0 / 0.75)", backdropFilter: "blur(4px)" }}>
-      <div className="w-full max-w-xl rounded-2xl overflow-hidden"
-        style={{ background: "oklch(0.17 0.012 260)", border: "1px solid oklch(0.28 0.012 260)", boxShadow: "0 25px 60px oklch(0 0 0 / 0.5)" }}>
+      style={{ background: "oklch(0 0 0 / 0.75)", backdropFilter: "blur(4px)" }}
+      onClick={onClose}>
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="icp-guide-title"
+        className="w-full max-w-xl rounded-2xl overflow-hidden"
+        style={{ background: "oklch(0.17 0.012 260)", border: "1px solid oklch(0.28 0.012 260)", boxShadow: "0 25px 60px oklch(0 0 0 / 0.5)" }}
+        onClick={(e) => e.stopPropagation()}>
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4"
           style={{ borderBottom: "1px solid oklch(0.24 0.012 260)", background: "oklch(0.15 0.012 260)" }}>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest"
+            <p id="icp-guide-title" className="text-xs font-semibold uppercase tracking-widest"
               style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>
               ICP Clarity Guide — Free
             </p>
@@ -78,13 +83,13 @@ export default function ICPClarityGuide({ onClose }: Props) {
               Step {step + 1} of {STEPS.length}
             </p>
           </div>
-          <button onClick={onClose} style={{ color: "oklch(0.45 0.008 260)" }} className="hover:opacity-70 transition-opacity">
-            <X size={18} />
+          <button onClick={onClose} aria-label="Close" style={{ color: "oklch(0.45 0.008 260)" }} className="hover:opacity-70 transition-opacity">
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
 
         {/* Progress bar */}
-        <div className="h-1" style={{ background: "oklch(0.22 0.012 260)" }}>
+        <div className="h-1" style={{ background: "oklch(0.22 0.012 260)" }} role="progressbar" aria-valuenow={step + 1} aria-valuemin={1} aria-valuemax={STEPS.length} aria-label="Guide progress">
           <div className="h-full transition-all duration-500"
             style={{ width: `${((step + 1) / STEPS.length) * 100}%`, background: "oklch(0.78 0.18 85)" }} />
         </div>
@@ -95,7 +100,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
             <>
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: "oklch(0.78 0.18 85 / 0.12)", color: "oklch(0.78 0.18 85)" }}>
+                  style={{ background: "oklch(0.78 0.18 85 / 0.12)", color: "oklch(0.78 0.18 85)" }} aria-hidden="true">
                   {current.icon}
                 </div>
                 <div>
@@ -106,16 +111,17 @@ export default function ICPClarityGuide({ onClose }: Props) {
                 </div>
               </div>
 
-              <p className="text-sm mb-3 font-medium" style={{ color: "oklch(0.78 0.008 260)" }}>
+              <label htmlFor="icp-guide-answer" className="text-sm mb-3 font-medium block" style={{ color: "oklch(0.78 0.008 260)" }}>
                 {current.question}
-              </p>
+              </label>
 
               <textarea
+                id="icp-guide-answer"
                 rows={4}
                 value={answers[current.field!] ?? ""}
                 onChange={e => setAnswers(a => ({ ...a, [current.field!]: e.target.value }))}
                 placeholder={current.placeholder ?? ""}
-                className="w-full px-4 py-3 rounded-lg text-sm resize-none outline-none transition-all"
+                className="w-full px-4 py-3 rounded-lg text-sm resize-none transition-all"
                 style={{
                   background: "oklch(0.21 0.014 260)",
                   border: "1px solid oklch(0.30 0.012 260)",
@@ -127,7 +133,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
               {current.tip && (
                 <div className="mt-3 flex items-start gap-2 p-3 rounded-lg"
                   style={{ background: "oklch(0.60 0.20 255 / 0.07)", border: "1px solid oklch(0.60 0.20 255 / 0.20)" }}>
-                  <Lightbulb size={13} style={{ color: "oklch(0.60 0.20 255)", marginTop: "2px", flexShrink: 0 }} />
+                  <Lightbulb size={13} style={{ color: "oklch(0.60 0.20 255)", marginTop: "2px", flexShrink: 0 }} aria-hidden="true" />
                   <p className="text-xs leading-relaxed" style={{ color: "oklch(0.60 0.008 260)" }}>{current.tip}</p>
                 </div>
               )}
@@ -137,7 +143,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
             <div>
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: "oklch(0.65 0.18 145 / 0.12)", color: "oklch(0.65 0.18 145)" }}>
+                  style={{ background: "oklch(0.65 0.18 145 / 0.12)", color: "oklch(0.65 0.18 145)" }} aria-hidden="true">
                   <Target size={28} />
                 </div>
                 <div>
@@ -159,7 +165,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
                     <p className="text-xs font-semibold uppercase tracking-widest mb-1"
                       style={{ color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>{item.label}</p>
                     <p className="text-sm leading-relaxed" style={{ color: "oklch(0.75 0.008 260)" }}>
-                      {item.value || <span style={{ color: "oklch(0.40 0.008 260)", fontStyle: "italic" }}>Not filled in</span>}
+                      {item.value || <span style={{ color: "oklch(0.55 0.008 260)", fontStyle: "italic" }}>Not filled in</span>}
                     </p>
                   </div>
                 ))}
@@ -197,7 +203,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
             onClick={() => step > 0 ? setStep(s => s - 1) : onClose()}
             className="flex items-center gap-2 px-4 py-2 rounded text-sm font-semibold transition-all"
             style={{ background: "oklch(0.22 0.012 260)", color: "oklch(0.65 0.008 260)", border: "1px solid oklch(0.30 0.012 260)" }}>
-            <ChevronLeft size={14} />
+            <ChevronLeft size={14} aria-hidden="true" />
             {step === 0 ? "Cancel" : "Back"}
           </button>
 
@@ -205,6 +211,7 @@ export default function ICPClarityGuide({ onClose }: Props) {
             <button
               onClick={() => setStep(s => s + 1)}
               disabled={!canNext}
+              aria-describedby={!canNext ? "icp-guide-next-hint" : undefined}
               className="flex items-center gap-2 px-5 py-2 rounded text-sm font-bold transition-all"
               style={{
                 background: canNext ? "oklch(0.78 0.18 85)" : "oklch(0.30 0.012 260)",
@@ -212,14 +219,15 @@ export default function ICPClarityGuide({ onClose }: Props) {
                 fontFamily: "Archivo, sans-serif",
                 cursor: canNext ? "pointer" : "not-allowed",
               }}>
-              Next <ChevronRight size={14} />
+              Next <ChevronRight size={14} aria-hidden="true" />
+              {!canNext && <span id="icp-guide-next-hint" className="sr-only">Write at least a few words to continue</span>}
             </button>
           ) : (
             <button
               onClick={onClose}
               className="flex items-center gap-2 px-5 py-2 rounded text-sm font-bold"
               style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
-              Build My Query <ArrowRight size={14} />
+              Build My Query <ArrowRight size={14} aria-hidden="true" />
             </button>
           )}
         </div>

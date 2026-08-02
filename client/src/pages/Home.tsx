@@ -26,6 +26,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen" style={{ background: "oklch(0.13 0.012 260)" }}>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
 
       {/* ── NAV ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
@@ -50,6 +51,7 @@ export default function Home() {
         </div>
       </nav>
 
+      <main id="main-content">
       {/* ── HERO ── */}
       <section className="relative min-h-screen flex items-center pt-20 overflow-hidden starfield">
         <div className="glow-orb glow-orb-gold glow-orb-drift" style={{ width: 420, height: 420, top: "-8%", left: "8%" }} />
@@ -62,7 +64,7 @@ export default function Home() {
 
             <div className="fade-up fade-up-2 inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest"
               style={{ background: "oklch(0.78 0.18 85 / 0.12)", border: "1px solid oklch(0.78 0.18 85 / 0.35)", color: "oklch(0.78 0.18 85)", fontFamily: "Archivo, sans-serif" }}>
-              <Zap size={12} /> No LinkedIn Account Required
+              <Zap size={12} aria-hidden="true" /> No LinkedIn Account Required
             </div>
 
             <h1 className="fade-up fade-up-3 mb-6" style={{ fontSize: "clamp(2.4rem, 6vw, 4rem)", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1.08, letterSpacing: "-0.03em" }}>
@@ -77,7 +79,7 @@ export default function Home() {
 
             <div className="fade-up fade-up-5 flex flex-wrap gap-4">
               <a href={isAuthenticated ? "/dashboard" : getLoginUrl()} style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", fontWeight: 700, padding: "0.875rem 2rem", borderRadius: "0.375rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.5rem", transition: "all 160ms", fontSize: "1rem" }}>
-                Get My List — Free to Start <ChevronRight size={16} />
+                Get My List — Free to Start <ChevronRight size={16} aria-hidden="true" />
               </a>
               <a href="#pricing" style={{ color: "oklch(0.72 0.008 260)", fontFamily: "Inter, sans-serif", padding: "0.875rem 1.5rem", borderRadius: "0.375rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.5rem", border: "1px solid oklch(0.30 0.012 260)", transition: "all 160ms", fontSize: "0.95rem" }}>
                 See Pricing
@@ -86,9 +88,9 @@ export default function Home() {
 
             <div className="fade-up fade-up-5 mt-12 flex flex-wrap gap-6">
               {[
-                { icon: <Shield size={14} />, label: "No LinkedIn ban risk" },
-                { icon: <Search size={14} />, label: "Google-indexed profiles" },
-                { icon: <Download size={14} />, label: "Export to CSV" },
+                { icon: <Shield size={14} aria-hidden="true" />, label: "No LinkedIn ban risk" },
+                { icon: <Search size={14} aria-hidden="true" />, label: "Google-indexed profiles" },
+                { icon: <Download size={14} aria-hidden="true" />, label: "Export to CSV" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center gap-2 text-sm" style={{ color: "oklch(0.60 0.010 260)" }}>
                   <span style={{ color: "oklch(0.60 0.20 255)" }}>{item.icon}</span>
@@ -163,7 +165,7 @@ export default function Home() {
               onClick={() => setShowClarityGuide(true)}
               className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all"
               style={{ background: "oklch(0.60 0.20 255 / 0.10)", border: "1px solid oklch(0.60 0.20 255 / 0.35)", color: "oklch(0.60 0.20 255)" }}>
-              🧭 Not sure who your ICP is? Start here — it's free
+              <span aria-hidden="true">🧭</span> Not sure who your ICP is? Start here — it's free
             </button>
           </div>
 
@@ -197,7 +199,7 @@ export default function Home() {
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8"
               style={{ background: "oklch(0.13 0.012 260 / 0.55)" }}>
               <div className="mb-4 p-4 rounded-full" style={{ background: "oklch(0.78 0.18 85 / 0.15)", border: "1px solid oklch(0.78 0.18 85 / 0.5)" }}>
-                <Lock size={22} style={{ color: "oklch(0.78 0.18 85)" }} />
+                <Lock size={22} style={{ color: "oklch(0.78 0.18 85)" }} aria-hidden="true" />
               </div>
               <h3 className="mb-2" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.3rem", color: "oklch(0.95 0.005 260)" }}>
                 Free to unlock — no card required
@@ -208,7 +210,7 @@ export default function Home() {
               <a href={getLoginUrl()}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded font-bold text-sm"
                 style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", textDecoration: "none" }}>
-                Create Free Account <ChevronRight size={16} />
+                Create Free Account <ChevronRight size={16} aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -349,7 +351,7 @@ export default function Home() {
             Build your profile, and let us find them for you. No guessing. No wasted outreach.
           </p>
           <a href={isAuthenticated ? "/dashboard" : getLoginUrl()} style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif", fontWeight: 700, padding: "0.9rem 2.25rem", borderRadius: "0.375rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.5rem", fontSize: "1rem", transition: "all 160ms" }}>
-            Get Started Free <ChevronRight size={16} />
+            Get Started Free <ChevronRight size={16} aria-hidden="true" />
           </a>
         </div>
       </section>
@@ -418,6 +420,7 @@ export default function Home() {
 
       {/* ── GOLD RULE ── */}
       <div className="gold-rule" />
+      </main>
 
       {/* ── FOOTER ── */}
       <footer className="py-8" style={{ background: "oklch(0.11 0.010 260)", borderTop: "1px solid oklch(0.22 0.012 260)" }}>
@@ -428,7 +431,7 @@ export default function Home() {
               The <span className="text-chrome-gold">Right-People List</span>
             </span>
           </div>
-          <p className="text-xs text-center" style={{ color: "oklch(0.40 0.005 260)" }}>
+          <p className="text-xs text-center" style={{ color: "oklch(0.55 0.006 260)" }}>
             Built for service-based business owners who are done wasting time on bad leads. Use responsibly — scrape public data only.
           </p>
         </div>
