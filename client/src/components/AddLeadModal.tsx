@@ -29,7 +29,7 @@ export default function AddLeadModal({ onClose, onAdded }: Props) {
     return (
       <div>
         <label htmlFor={id} className="block text-xs font-semibold uppercase tracking-widest mb-1"
-          style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{label}</label>
+          style={{ color: "oklch(0.66 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{label}</label>
         <input
           id={id}
           value={form[key] as string}
@@ -63,7 +63,7 @@ export default function AddLeadModal({ onClose, onAdded }: Props) {
 
         <div className="mt-3">
           <span id="relevance-score-label" className="block text-xs font-semibold uppercase tracking-widest mb-1"
-            style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Archivo, sans-serif" }}>Relevance Score</span>
+            style={{ color: "oklch(0.66 0.010 260)", fontFamily: "Archivo, sans-serif" }}>Relevance Score</span>
           <div className="flex gap-2" role="radiogroup" aria-labelledby="relevance-score-label">
             {(["high", "medium", "low"] as const).map(s => (
               <button key={s} onClick={() => setForm(f => ({ ...f, relevanceScore: s }))}
@@ -71,7 +71,7 @@ export default function AddLeadModal({ onClose, onAdded }: Props) {
                 className="px-3 py-1.5 rounded text-xs font-semibold capitalize transition-all"
                 style={{
                   background: form.relevanceScore === s ? "oklch(0.78 0.18 85 / 0.18)" : "oklch(0.22 0.014 260)",
-                  color: form.relevanceScore === s ? "oklch(0.78 0.18 85)" : "oklch(0.60 0.008 260)",
+                  color: form.relevanceScore === s ? "oklch(0.78 0.18 85)" : "oklch(0.66 0.008 260)",
                   border: `1px solid ${form.relevanceScore === s ? "oklch(0.78 0.18 85 / 0.5)" : "oklch(0.30 0.012 260)"}`,
                 }}>{s}</button>
             ))}
