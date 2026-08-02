@@ -138,7 +138,7 @@ export default function Home() {
               },
             ].map((card) => (
               <div key={card.step} className="p-6 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
-                <div className="mb-4 text-3xl font-black" style={{ fontFamily: "Archivo, sans-serif", color: card.accent, opacity: 0.6 }}>{card.step}</div>
+                <div className="mb-4 text-3xl font-black" aria-hidden="true" style={{ fontFamily: "Archivo, sans-serif", color: card.accent, opacity: 0.6 }}>{card.step}</div>
                 <h3 className="mb-3 text-lg" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 700, color: "oklch(0.92 0.005 260)" }}>{card.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: "oklch(0.60 0.008 260)" }}>{card.body}</p>
               </div>
@@ -248,7 +248,7 @@ export default function Home() {
                 <h3 className="mb-1" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.1rem", color: "oklch(0.92 0.005 260)" }}>{plan.name}</h3>
                 <div className="mb-4">
                   <span style={{ fontFamily: "Archivo, sans-serif", fontWeight: 900, fontSize: "2rem", color: "oklch(0.78 0.18 85)" }}>{plan.price}</span>
-                  <span style={{ color: "oklch(0.55 0.008 260)" }}>{plan.period}</span>
+                  <span style={{ color: "oklch(0.64 0.008 260)" }}>{plan.period}</span>
                 </div>
                 <ul className="mb-6 space-y-2">
                   {plan.features.map((f) => (
@@ -427,11 +427,11 @@ export default function Home() {
         <div className="container flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <img src="/logo.png" alt="The Right-People List" className="w-6 h-6 rounded-full" />
-            <span style={{ fontFamily: "Archivo, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "oklch(0.55 0.005 260)" }}>
+            <span style={{ fontFamily: "Archivo, sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "oklch(0.65 0.005 260)" }}>
               The <span className="text-chrome-gold">Right-People List</span>
             </span>
           </div>
-          <p className="text-xs text-center" style={{ color: "oklch(0.55 0.006 260)" }}>
+          <p className="text-xs text-center" style={{ color: "oklch(0.64 0.006 260)" }}>
             Built for service-based business owners who are done wasting time on bad leads. Use responsibly — scrape public data only.
           </p>
         </div>
