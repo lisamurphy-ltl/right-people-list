@@ -63,7 +63,7 @@ function FeatureList({ features, locked }: { features: string[]; locked: string[
       {locked.map(f => (
         <div key={f} className="flex items-start gap-2 text-sm">
           <span aria-hidden="true" style={{ color: "oklch(0.48 0.010 260)", marginTop: "2px", flexShrink: 0, fontSize: "0.85rem" }}>✕</span>
-          <span style={{ color: "oklch(0.52 0.008 260)" }}><span className="sr-only">Not included: </span>{f}</span>
+          <span style={{ color: "oklch(0.64 0.008 260)" }}><span className="sr-only">Not included: </span>{f}</span>
         </div>
       ))}
     </div>
@@ -132,10 +132,10 @@ export default function Pricing() {
           {/* 1. FREE */}
           <div className="relative flex flex-col rounded-xl p-6" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
             <div className="mb-5">
-              <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{FREE_TIER.name}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.66 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{FREE_TIER.name}</p>
               <div className="flex items-baseline gap-1">
                 <span style={{ fontSize: "2.2rem", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>{FREE_TIER.price}</span>
-                <span className="text-sm" style={{ color: "oklch(0.50 0.008 260)" }}>{FREE_TIER.period}</span>
+                <span className="text-sm" style={{ color: "oklch(0.64 0.008 260)" }}>{FREE_TIER.period}</span>
               </div>
               <p className="mt-2 text-xs font-semibold" style={{ color: "oklch(0.60 0.20 255)" }}>{FREE_TIER.leads}</p>
             </div>
@@ -171,7 +171,7 @@ export default function Pricing() {
             <div className="mb-5">
               <div className="flex items-baseline gap-1">
                 <span style={{ fontSize: "2.2rem", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>{activeTier.price}</span>
-                <span className="text-sm" style={{ color: "oklch(0.50 0.008 260)" }}>{activeTier.period}</span>
+                <span className="text-sm" style={{ color: "oklch(0.64 0.008 260)" }}>{activeTier.period}</span>
               </div>
               <p className="mt-2 text-xs font-semibold" style={{ color: "oklch(0.78 0.18 85)" }}>{activeTier.leads}</p>
             </div>
@@ -188,10 +188,10 @@ export default function Pricing() {
           {/* 3. PROMPT PACK */}
           <div className="relative flex flex-col rounded-xl p-6" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
             <div className="mb-5">
-              <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.55 0.010 260)", fontFamily: "Archivo, sans-serif" }}>Outreach Prompt Pack</p>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.66 0.010 260)", fontFamily: "Archivo, sans-serif" }}>Outreach Prompt Pack</p>
               <div className="flex items-baseline gap-1">
                 <span style={{ fontSize: "2.2rem", fontFamily: "Archivo, sans-serif", fontWeight: 800, color: "oklch(0.97 0.005 260)", lineHeight: 1 }}>$49</span>
-                <span className="text-sm" style={{ color: "oklch(0.50 0.008 260)" }}>one-time</span>
+                <span className="text-sm" style={{ color: "oklch(0.64 0.008 260)" }}>one-time</span>
               </div>
               <p className="mt-2 text-xs font-semibold" style={{ color: "oklch(0.60 0.20 255)" }}>Works with any plan</p>
             </div>

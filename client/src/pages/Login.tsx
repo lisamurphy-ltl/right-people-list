@@ -50,7 +50,7 @@ export default function Login() {
   };
 
   return (
-    <div
+    <main
       className="min-h-screen flex items-center justify-center px-4"
       style={{ background: "oklch(0.13 0.012 260)" }}
     >
@@ -67,7 +67,7 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
           {mode === "signup" && (
             <div>
-              <label htmlFor="login-name" className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+              <label htmlFor="login-name" className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.63 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
                 Name
               </label>
               <input id="login-name" name="name" autoComplete="name" style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
@@ -75,14 +75,14 @@ export default function Login() {
           )}
 
           <div>
-            <label htmlFor="login-email" className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+            <label htmlFor="login-email" className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.63 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
               Email
             </label>
             <input id="login-email" name="email" autoComplete="email" style={inputStyle} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" />
           </div>
 
           <div>
-            <label htmlFor="login-password" className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
+            <label htmlFor="login-password" className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "oklch(0.63 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
               Password
             </label>
             <input
@@ -124,6 +124,6 @@ export default function Login() {
           </button>
         </p>
       </div>
-    </div>
+    </main>
   );
 }
