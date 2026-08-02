@@ -162,7 +162,7 @@ function QuestionField({ q, answers, onChange, onCommit }: {
             className="w-full px-3 py-2 rounded text-sm"
             style={{ background: "oklch(0.14 0.012 260)", border: "1px solid oklch(0.28 0.012 260)", color: "oklch(0.85 0.008 260)" }}
           />
-          <p id={counterId} className="text-xs text-right mt-1" style={{ color: "oklch(0.58 0.008 260)" }}>
+          <p id={counterId} className="text-xs text-right mt-1" style={{ color: "oklch(0.62 0.008 260)" }}>
             {((answers[q.id] as string) ?? "").length} / {charLimit} characters
           </p>
         </>

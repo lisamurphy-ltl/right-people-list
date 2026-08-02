@@ -359,7 +359,7 @@ export default function Dashboard() {
           <div className="text-center py-20 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
             <Users size={40} style={{ color: "oklch(0.35 0.012 260)", margin: "0 auto 1rem" }} />
             <p style={{ color: "oklch(0.66 0.008 260)", fontFamily: "Archivo, sans-serif", fontWeight: 600 }}>No leads yet</p>
-            <p className="text-sm mt-1" style={{ color: "oklch(0.58 0.008 260)" }}>Click "Find My Leads" above and we'll fill this in automatically.</p>
+            <p className="text-sm mt-1" style={{ color: "oklch(0.62 0.008 260)" }}>Click "Find My Leads" above and we'll fill this in automatically.</p>
             <PaywallGate sub={sub} isAuthenticated={isAuthenticated} onAllowed={() => setShowAddModal(true)}>
               <button className="mt-4 px-5 py-2 rounded text-sm font-bold"
                 style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
@@ -411,9 +411,9 @@ export default function Dashboard() {
                             <span className="ml-1 px-1 rounded text-xs" style={{ background: "oklch(0.78 0.18 85 / 0.12)", color: "oklch(0.78 0.18 85)" }}>unverified</span>
                           </div>
                         ) : !canEnrich ? (
-                          <span className="text-xs" style={{ color: "oklch(0.58 0.008 260)" }}>Upgrade for email</span>
+                          <span className="text-xs" style={{ color: "oklch(0.62 0.008 260)" }}>Upgrade for email</span>
                         ) : (
-                          <span className="text-xs" style={{ color: "oklch(0.58 0.008 260)" }}>Not enriched</span>
+                          <span className="text-xs" style={{ color: "oklch(0.62 0.008 260)" }}>Not enriched</span>
                         )}
                         {lead.phone && (
                           <div className="flex items-center gap-1 text-xs mt-1" style={{ color: "oklch(0.65 0.18 145)" }}>
@@ -421,7 +421,7 @@ export default function Dashboard() {
                           </div>
                         )}
                         {!lead.phone && !hasVerified && lead.emailVerified && (
-                          <div className="text-xs mt-1" style={{ color: "oklch(0.58 0.008 260)" }}>Upgrade for phone</div>
+                          <div className="text-xs mt-1" style={{ color: "oklch(0.62 0.008 260)" }}>Upgrade for phone</div>
                         )}
                       </td>
                       <td className="px-4 py-3">

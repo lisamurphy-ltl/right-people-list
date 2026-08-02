@@ -396,7 +396,7 @@ export default function Home() {
               <div key={tool.num} className="p-6 rounded-xl relative"
                 style={{ background: "oklch(0.16 0.012 260)", border: "1px solid oklch(0.24 0.012 260)" }}>
                 <div className="flex items-start justify-between mb-4">
-                  <span aria-hidden="true" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 900, fontSize: "2rem", color: "oklch(0.46 0.012 260)", lineHeight: 1 }}>{tool.num}</span>
+                  <span aria-hidden="true" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 900, fontSize: "2rem", color: "oklch(0.54 0.012 260)", lineHeight: 1 }}>{tool.num}</span>
                   <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: tool.tagBg, color: tool.tagColor, fontFamily: "Archivo, sans-serif" }}>{tool.tag}</span>
                 </div>
                 <h3 className="mb-2" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.05rem", color: "oklch(0.92 0.005 260)" }}>{tool.name}</h3>
