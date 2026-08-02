@@ -138,7 +138,7 @@ export default function Home() {
               },
             ].map((card) => (
               <div key={card.step} className="p-6 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
-                <div className="mb-4 text-3xl font-black" aria-hidden="true" style={{ fontFamily: "Archivo, sans-serif", color: card.accent, opacity: 0.6 }}>{card.step}</div>
+                <div className="mb-4 text-3xl font-black" aria-hidden="true" style={{ fontFamily: "Archivo, sans-serif", color: card.accent }}>{card.step}</div>
                 <h3 className="mb-3 text-lg" style={{ fontFamily: "Archivo, sans-serif", fontWeight: 700, color: "oklch(0.92 0.005 260)" }}>{card.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: "oklch(0.60 0.008 260)" }}>{card.body}</p>
               </div>
