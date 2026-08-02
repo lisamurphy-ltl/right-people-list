@@ -282,7 +282,7 @@ export default function Dashboard() {
         {leadsLimit !== 99999 && (
           <div className="mb-6 p-4 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "oklch(0.58 0.012 260)", fontFamily: "Archivo, sans-serif" }}>Monthly Usage</span>
+              <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "oklch(0.66 0.012 260)", fontFamily: "Archivo, sans-serif" }}>Monthly Usage</span>
               <span className="text-xs" style={{ color: "oklch(0.60 0.008 260)" }}>
                 {leadsUsed} / {effectiveLimit} leads{bonusLeads > 0 ? ` (includes ${bonusLeads} top-up)` : ""}
               </span>
@@ -358,8 +358,8 @@ export default function Dashboard() {
         ) : !leadsData?.items?.length ? (
           <div className="text-center py-20 rounded-lg" style={{ background: "oklch(0.18 0.012 260)", border: "1px solid oklch(0.26 0.012 260)" }}>
             <Users size={40} style={{ color: "oklch(0.35 0.012 260)", margin: "0 auto 1rem" }} />
-            <p style={{ color: "oklch(0.55 0.008 260)", fontFamily: "Archivo, sans-serif", fontWeight: 600 }}>No leads yet</p>
-            <p className="text-sm mt-1" style={{ color: "oklch(0.40 0.008 260)" }}>Click "Find My Leads" above and we'll fill this in automatically.</p>
+            <p style={{ color: "oklch(0.66 0.008 260)", fontFamily: "Archivo, sans-serif", fontWeight: 600 }}>No leads yet</p>
+            <p className="text-sm mt-1" style={{ color: "oklch(0.58 0.008 260)" }}>Click "Find My Leads" above and we'll fill this in automatically.</p>
             <PaywallGate sub={sub} isAuthenticated={isAuthenticated} onAllowed={() => setShowAddModal(true)}>
               <button className="mt-4 px-5 py-2 rounded text-sm font-bold"
                 style={{ background: "oklch(0.78 0.18 85)", color: "oklch(0.13 0.012 260)", fontFamily: "Archivo, sans-serif" }}>
@@ -375,7 +375,7 @@ export default function Dashboard() {
                   <tr style={{ background: "oklch(0.18 0.012 260)", borderBottom: "1px solid oklch(0.26 0.012 260)" }}>
                     {["Name & Title","Company","Contact","Score","Last Contact","Status","Actions"].map(h => (
                       <th key={h} scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest"
-                        style={{ color: "oklch(0.50 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{h}</th>
+                        style={{ color: "oklch(0.62 0.010 260)", fontFamily: "Archivo, sans-serif" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -388,7 +388,7 @@ export default function Dashboard() {
                     <tr key={lead.id} style={{ background: rowColor ? `${rowColor} / 0.14` : (i % 2 === 0 ? "oklch(0.15 0.012 260)" : "oklch(0.17 0.012 260)"), borderBottom: "1px solid oklch(0.22 0.012 260)" }}>
                       <th scope="row" className="px-4 py-3 text-left font-normal">
                         <div className="font-semibold" style={{ color: "oklch(0.92 0.005 260)" }}>{lead.fullName ?? "—"}</div>
-                        <div className="text-xs mt-0.5" style={{ color: "oklch(0.55 0.008 260)" }}>{lead.title ?? ""}</div>
+                        <div className="text-xs mt-0.5" style={{ color: "oklch(0.66 0.008 260)" }}>{lead.title ?? ""}</div>
                         {lead.linkedinUrl && (
                           <a href={lead.linkedinUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs mt-1" style={{ color: "oklch(0.60 0.20 255)" }}>
                             LinkedIn <ExternalLink size={10} aria-hidden="true" /><span className="sr-only"> (opens in new tab)</span>
@@ -397,7 +397,7 @@ export default function Dashboard() {
                       </th>
                       <td className="px-4 py-3">
                         <div style={{ color: "oklch(0.75 0.008 260)" }}>{lead.company ?? "—"}</div>
-                        {lead.companyDomain && <div className="text-xs" style={{ color: "oklch(0.45 0.008 260)" }}>{lead.companyDomain}</div>}
+                        {lead.companyDomain && <div className="text-xs" style={{ color: "oklch(0.60 0.008 260)" }}>{lead.companyDomain}</div>}
                       </td>
                       <td className="px-4 py-3">
                         {lead.emailVerified ? (
@@ -411,9 +411,9 @@ export default function Dashboard() {
                             <span className="ml-1 px-1 rounded text-xs" style={{ background: "oklch(0.78 0.18 85 / 0.12)", color: "oklch(0.78 0.18 85)" }}>unverified</span>
                           </div>
                         ) : !canEnrich ? (
-                          <span className="text-xs" style={{ color: "oklch(0.40 0.008 260)" }}>Upgrade for email</span>
+                          <span className="text-xs" style={{ color: "oklch(0.58 0.008 260)" }}>Upgrade for email</span>
                         ) : (
-                          <span className="text-xs" style={{ color: "oklch(0.40 0.008 260)" }}>Not enriched</span>
+                          <span className="text-xs" style={{ color: "oklch(0.58 0.008 260)" }}>Not enriched</span>
                         )}
                         {lead.phone && (
                           <div className="flex items-center gap-1 text-xs mt-1" style={{ color: "oklch(0.65 0.18 145)" }}>
@@ -421,7 +421,7 @@ export default function Dashboard() {
                           </div>
                         )}
                         {!lead.phone && !hasVerified && lead.emailVerified && (
-                          <div className="text-xs mt-1" style={{ color: "oklch(0.40 0.008 260)" }}>Upgrade for phone</div>
+                          <div className="text-xs mt-1" style={{ color: "oklch(0.58 0.008 260)" }}>Upgrade for phone</div>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -454,7 +454,7 @@ export default function Dashboard() {
                           />
                         </div>
                         {statusLabel && (
-                          <div className="mt-1 text-xs font-semibold" style={{ color: rowColor ?? "oklch(0.50 0.008 260)" }}>
+                          <div className="mt-1 text-xs font-semibold" style={{ color: rowColor ?? "oklch(0.64 0.008 260)" }}>
                             {statusLabel}
                           </div>
                         )}
@@ -465,7 +465,7 @@ export default function Dashboard() {
                           className="mt-1.5 px-2 py-0.5 rounded-full text-xs font-semibold"
                           style={{
                             background: lead.notAFit ? "oklch(0.65 0.22 25 / 0.18)" : "oklch(0.22 0.012 260)",
-                            color: lead.notAFit ? CONTACT_RED : "oklch(0.50 0.008 260)",
+                            color: lead.notAFit ? CONTACT_RED : "oklch(0.64 0.008 260)",
                             border: `1px solid ${lead.notAFit ? "oklch(0.65 0.22 25 / 0.5)" : "oklch(0.30 0.012 260)"}`,
                           }}
                         >
@@ -473,7 +473,7 @@ export default function Dashboard() {
                         </button>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-xs capitalize" style={{ color: lead.enrichmentStatus === "enriched" ? "oklch(0.65 0.18 145)" : "oklch(0.50 0.008 260)" }}>
+                        <span className="text-xs capitalize" style={{ color: lead.enrichmentStatus === "enriched" ? "oklch(0.65 0.18 145)" : "oklch(0.64 0.008 260)" }}>
                           {lead.enrichmentStatus?.replace("_", " ") ?? "—"}
                         </span>
                       </td>
@@ -495,7 +495,7 @@ export default function Dashboard() {
                             onClick={() => deleteMutation.mutate({ leadId: lead.id })}
                             aria-label={`Delete ${lead.fullName ?? "this lead"}`}
                             className="p-1 rounded transition-all"
-                            style={{ color: "oklch(0.45 0.008 260)" }}
+                            style={{ color: "oklch(0.60 0.008 260)" }}
                           >
                             <Trash2 size={14} aria-hidden="true" />
                           </button>

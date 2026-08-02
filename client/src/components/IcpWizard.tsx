@@ -91,7 +91,7 @@ function QuestionField({ q, answers, onChange, onCommit }: {
         )}
         {q.required && <span className="sr-only"> (required)</span>}
       </p>
-      {q.prompt && <p className="text-xs mb-3" style={{ color: "oklch(0.55 0.008 260)" }}>{q.prompt}</p>}
+      {q.prompt && <p className="text-xs mb-3" style={{ color: "oklch(0.66 0.008 260)" }}>{q.prompt}</p>}
 
       {(q.type === "single" || q.type === "multi") && (
         <div
@@ -162,7 +162,7 @@ function QuestionField({ q, answers, onChange, onCommit }: {
             className="w-full px-3 py-2 rounded text-sm"
             style={{ background: "oklch(0.14 0.012 260)", border: "1px solid oklch(0.28 0.012 260)", color: "oklch(0.85 0.008 260)" }}
           />
-          <p id={counterId} className="text-xs text-right mt-1" style={{ color: "oklch(0.40 0.008 260)" }}>
+          <p id={counterId} className="text-xs text-right mt-1" style={{ color: "oklch(0.58 0.008 260)" }}>
             {((answers[q.id] as string) ?? "").length} / {charLimit} characters
           </p>
         </>
@@ -231,7 +231,7 @@ export default function IcpWizard({ onComplete }: { onComplete?: () => void }) {
         <h2 style={{ fontFamily: "Archivo, sans-serif", fontWeight: 800, fontSize: "1.3rem", color: "oklch(0.95 0.005 260)" }}>
           ICP Discovery
         </h2>
-        <span className="text-xs font-semibold" style={{ color: "oklch(0.55 0.008 260)" }}>
+        <span className="text-xs font-semibold" style={{ color: "oklch(0.66 0.008 260)" }}>
           Section {sectionIdx + 1} of {SECTIONS.length}
         </span>
       </div>

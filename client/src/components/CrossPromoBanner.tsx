@@ -88,7 +88,7 @@ export default function CrossPromoBanner() {
       <div className="flex items-center gap-2 shrink-0">
         <a href={promo.url} target="_blank" rel="noopener noreferrer"
           className="flex items-center gap-1.5 px-4 py-2 rounded text-sm font-bold whitespace-nowrap"
-          style={{ background: "oklch(0.60 0.20 255)", color: "oklch(0.98 0.005 260)", fontFamily: "Archivo, sans-serif", textDecoration: "none" }}>
+          style={{ background: "oklch(0.48 0.20 255)", color: "oklch(0.98 0.005 260)", fontFamily: "Archivo, sans-serif", textDecoration: "none" }}>
           {promo.cta} <ArrowRight size={14} aria-hidden="true" /><span className="sr-only"> (opens in new tab)</span>
         </a>
         <button
