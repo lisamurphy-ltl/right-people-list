@@ -69,6 +69,7 @@ export const leads = mysqlTable("leads", {
   // Outreach tracking
   lastContactedAt: timestamp("lastContactedAt"),
   notAFit: boolean("notAFit").default(false).notNull(),
+  exportedAt: timestamp("exportedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

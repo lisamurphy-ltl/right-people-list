@@ -114,6 +114,11 @@ export default function Dashboard() {
     onError: (e) => toast.error(e.message),
   });
 
+  const markExportedMutation = trpc.leads.markExported.useMutation({
+    onSuccess: () => refetchLeads(),
+    onError: (e) => toast.error(e.message),
+  });
+
   const checkoutMutation = trpc.subscription.createCheckout.useMutation({
     onSuccess: (data) => { if (data.url) window.location.href = data.url; },
     onError: (e) => toast.error(e.message),
@@ -168,10 +173,9 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const exportCSV = useCallback(() => {
-    if (!leadsData?.items?.length) return;
+  const downloadCSV = useCallback((items: NonNullable<typeof leadsData>["items"], filename: string) => {
     const headers = ["Name","Title","Company","LinkedIn URL","Email (Unverified)","Email (Verified)","Phone","Location","Score","Enrichment Status"];
-    const rows = leadsData.items.map(l => [
+    const rows = items.map(l => [
       l.fullName ?? "",
       l.title ?? "",
       l.company ?? "",
@@ -186,10 +190,29 @@ export default function Dashboard() {
     const csv = [headers.join(","), ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "icp-scout-leads.csv"; a.click();
+    const a = document.createElement("a"); a.href = url; a.download = filename; a.click();
     URL.revokeObjectURL(url);
+  }, []);
+
+  const exportCSV = useCallback(() => {
+    if (!leadsData?.items?.length) return;
+    downloadCSV(leadsData.items, "right-people-list-leads.csv");
+    markExportedMutation.mutate({ leadIds: leadsData.items.map(l => l.id) });
     toast.success("CSV exported!");
-  }, [leadsData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leadsData, downloadCSV]);
+
+  const exportNewOnlyCSV = useCallback(() => {
+    const newItems = (leadsData?.items ?? []).filter(l => !l.exportedAt);
+    if (newItems.length === 0) {
+      toast.info("No new leads to download — everything's already been exported.");
+      return;
+    }
+    downloadCSV(newItems, "right-people-list-leads-new.csv");
+    markExportedMutation.mutate({ leadIds: newItems.map(l => l.id) });
+    toast.success(`Downloaded ${newItems.length} new lead${newItems.length === 1 ? "" : "s"}.`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leadsData, downloadCSV]);
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: "oklch(0.13 0.012 260)" }} role="status" aria-live="polite">
@@ -325,8 +348,20 @@ export default function Dashboard() {
             )}
             <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 rounded text-sm font-semibold transition-all"
               style={{ background: "oklch(0.22 0.012 260)", color: "oklch(0.68 0.008 260)", border: "1px solid oklch(0.30 0.012 260)" }}>
-              <Download size={14} /> Export CSV
+              <Download size={14} aria-hidden="true" /> Export CSV
             </button>
+            {leadsData?.items && leadsData.items.length > 0 && (
+              <button onClick={exportNewOnlyCSV} className="flex items-center gap-2 px-4 py-2 rounded text-sm font-semibold transition-all"
+                style={{ background: "oklch(0.22 0.012 260)", color: "oklch(0.68 0.008 260)", border: "1px solid oklch(0.30 0.012 260)" }}>
+                <Download size={14} aria-hidden="true" /> Download New Only
+                {leadsData.items.some(l => !l.exportedAt) && (
+                  <span className="px-1.5 py-0.5 rounded-full text-xs font-bold"
+                    style={{ background: "oklch(0.78 0.18 85 / 0.2)", color: "oklch(0.78 0.18 85)" }}>
+                    {leadsData.items.filter(l => !l.exportedAt).length}
+                  </span>
+                )}
+              </button>
+            )}
             {leadsData?.items && leadsData.items.length > 0 && (
               <button
                 onClick={() => {

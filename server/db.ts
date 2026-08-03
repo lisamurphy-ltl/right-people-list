@@ -1,4 +1,4 @@
-import { and, eq, isNotNull, like, ne, or } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, like, ne, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { enrichmentJobs, icpProfiles, InsertEnrichmentJob, InsertLead, InsertScrapedLeadIndexRow, InsertSubscription, leads, scrapedLeadsIndex, subscriptions, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -198,6 +198,14 @@ export async function deleteAllLeads(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.delete(leads).where(eq(leads.userId, userId));
+}
+
+export async function markLeadsExported(userId: number, leadIds: number[]) {
+  if (leadIds.length === 0) return;
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(leads).set({ exportedAt: new Date() })
+    .where(and(eq(leads.userId, userId), inArray(leads.id, leadIds)));
 }
 
 // ── Scraped Lead Index ───────────────────────────────────────────────────────

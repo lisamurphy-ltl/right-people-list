@@ -20,6 +20,7 @@ import {
   getOrCreateSubscription,
   getUserByEmail,
   incrementLeadsUsed,
+  markLeadsExported,
   PLAN_LIMITS,
   saveIcpProfile,
   touchLastSignedIn,
@@ -558,6 +559,13 @@ export const appRouter = router({
       await updateSubscription(ctx.user.id, { leadsUsed: 0 });
       return { success: true };
     }),
+
+    markExported: protectedProcedure
+      .input(z.object({ leadIds: z.array(z.number()) }))
+      .mutation(async ({ ctx, input }) => {
+        await markLeadsExported(ctx.user.id, input.leadIds);
+        return { success: true };
+      }),
   }),
 
   icpProfile: router({
